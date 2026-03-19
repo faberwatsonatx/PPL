@@ -833,6 +833,37 @@ function init() {
                 }
             }
             const keyPointsList = document.getElementById('keyPointsList');
+            // Smart assessment (works without API)
+            const studentAnswer = document.getElementById('answerInput').value.trim();
+            const assessment = assessAnswerSmart(studentAnswer, q);
+            
+            // Show assessment panel
+            let assessmentContainer = document.getElementById('smartAssessment');
+            if (!assessmentContainer) {
+                assessmentContainer = document.createElement('div');
+                assessmentContainer.id = 'smartAssessment';
+                document.getElementById('answerReviewContainer').insertBefore(
+                    assessmentContainer, 
+                    document.getElementById('keyPointsContainer') || document.getElementById('answerReviewContainer').firstChild
+                );
+            }
+            if (assessment) {
+                assessmentContainer.innerHTML = renderAssessment(assessment, q);
+                assessmentContainer.style.display = 'block';
+                
+                // Auto-check covered key points
+                setTimeout(() => {
+                    const checkboxes = document.querySelectorAll('.key-point');
+                    checkboxes.forEach((cb, i) => {
+                        const kpText = cb.querySelector('span:last-child').textContent;
+                        if (assessment.covered.includes(kpText)) {
+                            cb.querySelector('.checkbox-icon').textContent = '☑';
+                            cb.style.opacity = '0.7';
+                        }
+                    });
+                }, 100);
+            }
+            
             keyPointsList.innerHTML = q.keyPoints.map(kp => `<div class="key-point"><span class="checkbox-icon">☐</span> <span>${kp}</span></div>`).join('');
             document.getElementById('keyPointsContainer').style.display = 'block';
             if (q.followUps && q.followUps.length > 0) {
@@ -1306,6 +1337,90 @@ function init() {
             if (saved.topics && saved.topics.length > 0) {
                 document.getElementById('focusTopicsDisplay').textContent = saved.topics.join(' • ');
             }
+        }
+
+    
+        // === SMART ANSWER ASSESSMENT (no API needed) ===
+        function assessAnswerSmart(userAnswer, q) {
+            if (!userAnswer || !q.keyPoints) return null;
+            
+            const answer = userAnswer.toLowerCase();
+            const results = {covered: [], missed: [], score: 0, total: q.keyPoints.length, feedback: ''};
+            
+            q.keyPoints.forEach(kp => {
+                // Break key point into searchable terms
+                const terms = kp.toLowerCase()
+                    .replace(/[()§]/g, ' ')
+                    .split(/[,\/&·\-]+/)
+                    .map(t => t.trim())
+                    .filter(t => t.length > 2);
+                
+                // Check if any significant terms from the key point appear in the answer
+                const matched = terms.some(term => {
+                    // Split multi-word terms and check if most words appear
+                    const words = term.split(/\s+/).filter(w => w.length > 2);
+                    if (words.length <= 1) return answer.includes(term);
+                    const matchedWords = words.filter(w => answer.includes(w));
+                    return matchedWords.length >= Math.ceil(words.length * 0.6);
+                });
+                
+                if (matched) results.covered.push(kp);
+                else results.missed.push(kp);
+            });
+            
+            results.score = results.covered.length;
+            const pct = results.total > 0 ? (results.score / results.total) : 0;
+            
+            if (pct >= 0.8) {
+                results.grade = 'satisfactory';
+                results.feedback = 'Strong answer! You covered most key points.';
+            } else if (pct >= 0.5) {
+                results.grade = 'partial';
+                results.feedback = 'Decent start, but you missed some important points.';
+            } else {
+                results.grade = 'unsatisfactory';
+                results.feedback = 'This area needs more study. Review the model answer carefully.';
+            }
+            
+            return results;
+        }
+        
+        function renderAssessment(assessment, q) {
+            if (!assessment) return '';
+            
+            const gradeColors = {satisfactory: '#4ade80', partial: '#fbbf24', unsatisfactory: '#f87171'};
+            const gradeLabels = {satisfactory: '✅ Satisfactory', partial: '⚠️ Partially Satisfactory', unsatisfactory: '❌ Needs Work'};
+            const color = gradeColors[assessment.grade] || '#94a3b8';
+            
+            let html = '<div style="background:#0f172a;border:1px solid ' + color + ';border-radius:10px;padding:16px;margin:12px 0;">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+            html += '<span style="color:' + color + ';font-weight:700;font-size:15px;">' + gradeLabels[assessment.grade] + '</span>';
+            html += '<span style="color:#94a3b8;font-size:13px;">' + assessment.score + '/' + assessment.total + ' key points</span>';
+            html += '</div>';
+            html += '<p style="color:#cbd5e1;font-size:13px;margin-bottom:10px;">' + assessment.feedback + '</p>';
+            
+            if (assessment.covered.length > 0) {
+                html += '<div style="margin-bottom:8px;"><span style="color:#4ade80;font-size:12px;font-weight:600;">✓ You covered:</span>';
+                assessment.covered.forEach(p => { html += '<div style="color:#86efac;font-size:12px;padding:2px 0 2px 16px;">• ' + p + '</div>'; });
+                html += '</div>';
+            }
+            
+            if (assessment.missed.length > 0) {
+                html += '<div><span style="color:#f87171;font-size:12px;font-weight:600;">✗ You missed:</span>';
+                assessment.missed.forEach(p => { html += '<div style="color:#fca5a5;font-size:12px;padding:2px 0 2px 16px;">• ' + p + '</div>'; });
+                html += '</div>';
+            }
+            
+            // Add tips if available
+            if (q.dontSay) {
+                html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155;">';
+                html += '<span style="color:#fbbf24;font-size:12px;">🚫 Watch out: </span>';
+                html += '<span style="color:#94a3b8;font-size:12px;">' + q.dontSay + '</span>';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            return html;
         }
 
     </script>
