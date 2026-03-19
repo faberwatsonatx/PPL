@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual DPE v3 - Private Pilot Oral Exam Prep</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #334155; padding-bottom: 20px; }
+        h1 { font-size: 28px; color: #60a5fa; }
+        .header-stats { display: flex; gap: 30px; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #60a5fa; }
+        .header-controls { display: flex; gap: 15px; }
+        .btn-icon { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s ease; }
+        .btn-icon:hover { background: #334155; border-color: #60a5fa; }
+        .btn-icon.active { background: #60a5fa; color: #0f172a; border-color: #60a5fa; }
+        .dpe-focus-banner { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-left: 4px solid #f59e0b; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+        .dpe-focus-banner strong { color: #f59e0b; }
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mode-btn { padding: 10px 20px; background: #1e293b; border: 2px solid #334155; color: #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; }
+        .mode-btn.active { background: #60a5fa; color: #0f172a; border-color: #60a5fa; }
+        .main-content { display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-bottom: 20px; }
+        .question-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 30px; }
+        .dpe-speech { background: #0f4c75; border-left: 4px solid #60a5fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; font-size: 16px; font-weight: 500; }
+        .question-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #334155; font-size: 12px; }
+        .badge { display: inline-block; padding: 4px 10px; background: #334155; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #cbd5e1; margin-right: 5px; }
+        .badge.core { background: #dc2626; color: white; }
+        .badge.common { background: #f59e0b; color: white; }
+        .badge.deep { background: #8b5cf6; color: white; }
+        .tips-collapsible { margin-bottom: 20px; }
+        .tips-header { background: #334155; padding: 12px 16px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 14px; user-select: none; }
+        .tips-content { background: #0f172a; padding: 15px; border-radius: 0 0 6px 6px; display: none; margin-top: 2px; }
+        .tips-content.show { display: block; }
+        .tip-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
+        .tip-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .answer-input-group { margin-bottom: 20px; }
+        .answer-input-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        textarea { width: 100%; min-height: 120px; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: inherit; font-size: 14px; }
+        textarea:focus { outline: none; border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1); }
+        .voice-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+        .mic-button { padding: 10px 16px; background: #dc2626; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .mic-button:hover { background: #b91c1c; }
+        .mic-button.listening { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); } }
+        .button-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { flex: 1; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s ease; }
+        .btn-primary { background: #60a5fa; color: #0f172a; }
+        .btn-primary:hover { background: #3b82f6; }
+        .btn-secondary { background: #334155; color: #e2e8f0; }
+        .assessment-panel { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 1px solid #60a5fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; }
+        .assessment-panel.show { display: block; }
+        .assessment-header { font-weight: 600; color: #60a5fa; font-size: 16px; margin-bottom: 15px; }
+        .assessment-content { font-size: 14px; line-height: 1.6; }
+        .key-points { background: #0f172a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .key-points-title { font-weight: 600; margin-bottom: 10px; color: #cbd5e1; font-size: 13px; text-transform: uppercase; }
+        .key-point { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; padding: 8px; background: #1e293b; border-radius: 6px; font-size: 13px; }
+        .follow-ups { background: #0f172a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .follow-up-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
+        .follow-up-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .follow-up-q { font-weight: 600; color: #60a5fa; margin-bottom: 6px; font-size: 13px; }
+        .follow-up-a { font-size: 12px; color: #cbd5e1; margin-bottom: 4px; }
+        .follow-up-tip { font-size: 11px; color: #94a3b8; font-style: italic; }
+        .grading-section { background: #0f172a; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .grading-title { font-weight: 600; margin-bottom: 10px; color: #cbd5e1; font-size: 13px; text-transform: uppercase; }
+        .grade-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .grade-btn { padding: 10px; border: 2px solid #334155; background: #1e293b; color: #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .grade-btn.selected { background: #60a5fa; color: #0f172a; border-color: #60a5fa; }
+        .sidebar { display: flex; flex-direction: column; gap: 15px; }
+        .progress-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; }
+        .progress-title { font-weight: 600; font-size: 12px; text-transform: uppercase; color: #cbd5e1; margin-bottom: 10px; }
+        .progress-item { margin-bottom: 12px; }
+        .progress-item:last-child { margin-bottom: 0; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+        .progress-bar { width: 100%; height: 6px; background: #0f172a; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #60a5fa, #3b82f6); transition: width 0.3s ease; }
+        .settings-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .settings-modal.show { display: flex; }
+        .settings-content { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        .close-btn { background: none; border: none; color: #e2e8f0; font-size: 24px; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .settings-group { margin-bottom: 25px; }
+        .settings-group-title { font-weight: 600; margin-bottom: 12px; color: #cbd5e1; font-size: 14px; }
+        .api-key-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
+        .toggle-switch { display: flex; align-items: center; gap: 12px; padding: 10px; background: #0f172a; border-radius: 6px; cursor: pointer; user-select: none; }
+        .toggle-input { width: 44px; height: 24px; background: #334155; border-radius: 12px; position: relative; cursor: pointer; border: none; padding: 0; }
+        .toggle-input::after { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 10px; top: 2px; left: 2px; transition: left 0.3s ease; }
+        .toggle-input.active { background: #60a5fa; }
+        .toggle-input.active::after { left: 22px; }
+        .select-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
+        .topic-btn { padding: 12px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 13px; text-align: center; transition: all 0.3s ease; }
+        .topic-btn:hover { border-color: #60a5fa; background: #334155; }
+        .topic-btn.selected { background: #60a5fa; color: #0f172a; border-color: #60a5fa; }
+        .model-answer { background: #0f172a; border-left: 3px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; }
+        .model-answer-title { font-weight: 600; color: #10b981; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
+        .reference { background: #1e293b; padding: 10px 12px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; border-left: 3px solid #8b5cf6; }
+        .reference-title { font-weight: 600; color: #8b5cf6; margin-bottom: 4px; }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            header { flex-direction: column; gap: 15px; }
+            .grade-buttons { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛩️ Virtual DPE v3</h1>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Questions</span>
+                    <span class="stat-value"><span id="questionsAttempted">0</span>/<span id="totalQuestions">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Accuracy</span>
+                    <span class="stat-value"><span id="accuracy">0</span>%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Streak</span>
+                    <span class="stat-value"><span id="streak">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Days Left</span>
+                    <span class="stat-value"><span id="daysLeft">11</span></span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="btn-icon" id="voiceToggle" title="Toggle Voice Mode">🎤</button>
+                <button class="btn-icon" id="settingsBtn" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <div class="dpe-focus-banner">
+            <strong>🎯 DPE Focus:</strong> Inoperative Equipment Decision Tree • Weight & Balance • Maintenance Records • Weather Decision Making
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="practice">📚 Practice</button>
+            <button class="mode-btn" data-mode="mock">🎙️ Mock Oral</button>
+            <button class="mode-btn" data-mode="weak">📊 Weak Areas</button>
+        </div>
+
+        <div id="practiceModeContent">
+            <h2 style="margin-bottom: 20px; color: #60a5fa;">Select a Topic</h2>
+            <div class="topic-grid" id="topicGrid"></div>
+        </div>
+
+        <div id="mockModeContent" style="display: none;">
+            <p style="margin-bottom: 20px; color: #94a3b8;">Mock Oral: 60 questions from all topics</p>
+            <button class="btn btn-primary" id="startMockBtn" style="width: 200px;">Start Mock Exam</button>
+        </div>
+
+        <div id="weakModeContent" style="display: none;">
+            <p style="margin-bottom: 20px; color: #94a3b8;">Practice your weakest topics:</p>
+            <div id="weakAreasContainer"></div>
+        </div>
+
+        <div class="main-content" id="questionContent" style="display: none;">
+            <div class="question-card">
+                <div class="question-meta">
+                    <div>
+                        <span id="questionNumber">Q1</span>
+                        <span id="difficultyBadge" class="badge core">Core</span>
+                        <span id="tagsBadge"></span>
+                    </div>
+                    <span id="topicName" style="color: #60a5fa;"></span>
+                </div>
+
+                <div class="dpe-speech">
+                    👨‍✈️ <span id="questionText"></span>
+                </div>
+
+                <div class="tips-collapsible">
+                    <div class="tips-header" onclick="toggleTips(this)">💡 Tips & References ▼</div>
+                    <div class="tips-content">
+                        <div class="tip-item"><span style="color: #60a5fa; font-weight: bold;">💡</span> <span id="tipText"></span></div>
+                        <div class="tip-item"><span style="color: #f59e0b; font-weight: bold;">🚫</span> <span id="dontSayText"></span></div>
+                        <div class="tip-item"><span style="color: #8b5cf6; font-weight: bold;">📖</span> <span id="ifUnsureText"></span></div>
+                        <div class="tip-item"><span style="color: #8b5cf6; font-weight: bold;">📋</span> <span id="refText"></span></div>
+                    </div>
+                </div>
+
+                <div class="answer-input-group">
+                    <label>Your Answer</label>
+                    <div class="voice-controls" id="voiceControlsGroup" style="display: none;">
+                        <button class="mic-button" id="micButton" onclick="toggleMicrophone()">🎤 Listening...</button>
+                        <span class="voice-status" id="voiceStatus"></span>
+                    </div>
+                    <textarea id="answerInput" placeholder="Type or speak your answer..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="checkAnswer()">Check Answer</button>
+                    <button class="btn btn-secondary" onclick="nextQuestion()">Skip</button>
+                </div>
+
+                <div id="assessmentContainer"></div>
+
+                <div id="answerReviewContainer" style="display: none;">
+                    <div class="model-answer">
+                        <div class="model-answer-title">📌 Model Answer</div>
+                        <div id="modelAnswerText" style="line-height: 1.6;"></div>
+                    </div>
+
+                    <div id="referenceContainer" style="display: none;">
+                        <div class="reference">
+                            <div class="reference-title">📋 Reference</div>
+                            <span id="referenceText"></span>
+                        </div>
+                    </div>
+
+                    <div class="key-points" id="keyPointsContainer" style="display: none;">
+                        <div class="key-points-title">Key Points to Cover</div>
+                        <div id="keyPointsList"></div>
+                    </div>
+
+                    <div class="follow-ups" id="followUpsContainer" style="display: none;">
+                        <div class="key-points-title">Follow-Up Questions</div>
+                        <div id="followUpsList"></div>
+                    </div>
+
+                    <div class="grading-section">
+                        <div class="grading-title">Grade This Answer</div>
+                        <div class="grade-buttons">
+                            <button class="grade-btn" onclick="gradeAnswer('sat')">Satisfactory</button>
+                            <button class="grade-btn" onclick="gradeAnswer('partial')">Partial</button>
+                            <button class="grade-btn" onclick="gradeAnswer('unsat')">Unsatisfactory</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="nextQuestion()">Next Question</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="progress-card">
+                    <div class="progress-title">This Session</div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Correct</span>
+                            <span><span id="sessionCorrect">0</span>/<span id="sessionAttempted">0</span></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="sessionProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <div class="progress-title">By Topic</div>
+                    <div id="topicProgressContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">×</button>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">🤖 AI Assessment</div>
+                <label style="display: block; margin-bottom: 8px; font-size: 12px; color: #94a3b8;">Anthropic API Key</label>
+                <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-...">
+                <button class="btn btn-secondary" onclick="saveSettings()" style="width: 100%; margin-bottom: 10px;">Save</button>
+                <button class="btn btn-secondary" onclick="clearApiKey()" style="width: 100%;">Clear</button>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">🎤 Voice Settings</div>
+                <div class="toggle-switch" onclick="toggleVoiceSetting('readQuestion')">
+                    <div style="flex: 1;">Read Questions</div>
+                    <button class="toggle-input" id="readQuestionToggle"></button>
+                </div>
+                <div class="toggle-switch" onclick="toggleVoiceSetting('recognitionEnabled')" style="margin-top: 10px;">
+                    <div style="flex: 1;">Speech Recognition</div>
+                    <button class="toggle-input" id="recognitionToggle"></button>
+                </div>
+                <label style="display: block; margin-top: 12px; margin-bottom: 8px; font-size: 12px; color: #94a3b8;">Voice Speed</label>
+                <select id="voiceSpeedSelect" class="select-input" onchange="saveSettings()">
+                    <option value="0.8">Slow</option>
+                    <option value="1" selected>Normal</option>
+                    <option value="1.2">Fast</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questionBank = [
+// === PILOT QUALIFICATIONS ===
+{id:'pq1',topic:'Pilot Qualifications',q:'What are the eligibility requirements for a private pilot certificate?',a:'Per §61.103: At least 17 years old, read/speak/write/understand English, hold at least a 3rd class medical (or BasicMed), received required training endorsements, meet aeronautical experience requirements of §61.109, passed knowledge and practical tests.',ref:'14 CFR §61.103',diff:'core',tags:['likely'],keyPoints:['17 years old','English proficiency','Valid medical certificate','Training endorsements','Aeronautical experience (§61.109)','Knowledge and practical tests'],tips:'List all six requirements systematically. DPEs love organized answers.',dontSay:'Don\'t forget the medical — many students skip it.',ifUnsure:'Reference 14 CFR §61.103 directly.',followUps:[{q:'What aeronautical experience is required under §61.109?',a:'40 hours total, 20 hours dual, 10 hours solo, 3 hours XC training, 3 hours night, 3 hours instrument, 3 hours test prep within 2 months, plus solo XC requirements.',tip:'Know the hour breakdowns cold.'}]},
+
+{id:'pq2',topic:'Pilot Qualifications',q:'What privileges and limitations apply to you as a private pilot?',a:'Per §61.113: Cannot act as PIC carrying passengers or property for compensation or hire. May not pay less than pro rata share of operating expenses (fuel, oil, airport, rental). Exceptions: flights incidental to business (no passengers for hire), charitable event flights, aircraft salesperson with 200+ hours, towing gliders.',ref:'14 CFR §61.113',diff:'core',tags:['likely'],keyPoints:['No compensation or hire','Pro rata share rule','Business flight exception','Charitable event exception','Aircraft salesperson exception'],tips:'Lead with the general rule, then list exceptions. Shows you understand the structure.',dontSay:'Don\'t say "I can\'t make money flying" — be precise about what compensation means.',ifUnsure:'Say: "The limitations are in §61.113, let me walk through what I remember."',followUps:[{q:'Your friend offers to pay for ALL the fuel on a flight. Can you accept?',a:'No — you must pay at least your pro rata share. With two people, each pays at least half of fuel, oil, airport expenditures, and rental fees.',tip:'This is a classic trap question. Know it cold.'}]},
+
+{id:'pq3',topic:'Pilot Qualifications',q:'Show me you\'re current and legal to fly today with passengers.',a:'Need: valid pilot certificate, current medical (3rd class: 60 months if under 40, 24 months if 40+), flight review within 24 calendar months (§61.56), 3 takeoffs/landings in 90 days in same category/class (§61.57), government-issued photo ID.',ref:'14 CFR §61.56, §61.57, §61.3',diff:'core',tags:['likely'],keyPoints:['Valid pilot certificate','Current medical certificate','Flight review within 24 months','90-day currency (3 takeoffs/landings)','Photo ID'],tips:'Have your logbook tabbed to show currency. DPEs love preparedness.',dontSay:'Don\'t confuse calendar months with days. 24 calendar months means the end of the 24th month.',ifUnsure:'Reference §61.3 for required documents, §61.56 for flight review, §61.57 for recent experience.',followUps:[{q:'What additional currency is needed to carry passengers at night?',a:'3 takeoffs and landings to a full stop during the period from 1 hour after sunset to 1 hour before sunrise, within preceding 90 days, same category/class.',tip:'Emphasize "to a full stop" — touch-and-goes don\'t count for night.'}]},
+
+{id:'pq4',topic:'Pilot Qualifications',q:'Explain the difference between current and proficient.',a:'Currency is meeting legal regulatory minimums — flight review, 90-day landings, valid medical. Proficiency is your actual skill level and comfort. You can be legally current but not proficient. Example: barely meeting the 3 landing requirement but not having flown in challenging conditions. Responsible pilots use personal minimums and honest self-assessment beyond legal requirements.',ref:'ACS Risk Management',diff:'core',tags:['likely'],keyPoints:['Currency = legal minimums','Proficiency = actual skill level','Can be current but not proficient','Personal minimums concept','Honest self-assessment'],tips:'This question tests your judgment. Show maturity by discussing personal minimums.',dontSay:'Don\'t say "if I\'m current, I\'m good to go." That shows poor ADM.',ifUnsure:'Discuss the concept of personal minimums — it shows good aeronautical decision making.',followUps:[{q:'How would you establish personal minimums?',a:'Consider experience level, recency in type, weather comfort level, airport familiarity. Set higher minimums than regulatory requirements and adjust as proficiency improves.',tip:'Give a specific example — "as a new private pilot, my ceiling minimum would be 3000 feet, not the VFR 1000."'}]},
+
+{id:'pq5',topic:'Pilot Qualifications',q:'What documents must you personally have to exercise private pilot privileges?',a:'Per §61.3: pilot certificate, current medical certificate (or BasicMed documentation), government-issued photo ID. For the checkride specifically: logbook with endorsements, knowledge test results, IACRA application.',ref:'14 CFR §61.3',diff:'core',tags:['likely'],keyPoints:['Pilot certificate','Medical certificate','Photo ID','Logbook for checkride','Knowledge test results for checkride'],tips:'Keep it simple — three items for normal flight, additional items for the checkride.',dontSay:'Don\'t say logbooks are required for normal flight — they\'re only needed for the checkride and to prove currency if asked.',ifUnsure:'§61.3 covers what you need on your person.',followUps:[{q:'Is your logbook required to be in the aircraft during normal flight?',a:'No. The logbook is not required to be carried. However, you must be able to present it to the FAA upon request to prove currency.',tip:'This is a common misconception — know the distinction.'}]},
+
+{id:'pq6',topic:'Pilot Qualifications',q:'What is a flight review and what does it consist of?',a:'Per §61.56: minimum 1 hour ground training reviewing Part 91 rules, and minimum 1 hour flight training with maneuvers selected by the instructor. Required every 24 calendar months. Alternatives: passing a proficiency check, completing a WINGS phase, or obtaining a new certificate/rating.',ref:'14 CFR §61.56',diff:'common',tags:[],keyPoints:['1 hour ground minimum','1 hour flight minimum','Part 91 review','Every 24 calendar months','WINGS alternative'],tips:'Mention the WINGS program — it shows you know about continuing education.',dontSay:'Don\'t call it a "BFR" — that term was replaced years ago. It\'s just a "flight review."',ifUnsure:'§61.56 covers flight review requirements.',followUps:[{q:'If you get a new rating, does that count as a flight review?',a:'Yes — obtaining any new certificate or rating satisfies the flight review requirement.',tip:'This is a lesser-known alternative.'}]},
+
+{id:'pq7',topic:'Pilot Qualifications',q:'What endorsements would a private pilot need beyond the basic certificate?',a:'High-performance (>200 HP, §61.31f), complex (retractable gear, flaps, controllable prop, §61.31e), tailwheel (§61.31i), high-altitude (service ceiling >25,000 ft, §61.31g). Our C172S at 180 HP with fixed gear and fixed prop requires none of these.',ref:'14 CFR §61.31',diff:'common',tags:[],keyPoints:['High-performance (>200 HP)','Complex (retractable, flaps, controllable prop)','Tailwheel','High-altitude (>25,000 ft)','C172S needs none of these'],tips:'Immediately relate back to YOUR aircraft — "our C172S doesn\'t need any of these because..."',dontSay:'Don\'t confuse high-performance with complex — they\'re different endorsements with different requirements.',ifUnsure:'§61.31 covers all additional endorsements.',followUps:[{q:'Is the C172S a high-performance airplane?',a:'No — the IO-360-L2A produces 180 HP, which is under the 200 HP threshold for high-performance.',tip:'Know your aircraft\'s HP. This is an easy confidence builder.'}]},
+
+{id:'pq8',topic:'Pilot Qualifications',q:'If you change your permanent mailing address, what must you do?',a:'Per §61.60: notify the FAA Airmen Certification Branch in writing within 30 days. Can update online at FAA website. Failure to notify means you cannot exercise certificate privileges.',ref:'14 CFR §61.60',diff:'common',tags:[],keyPoints:['Notify FAA in writing','Within 30 days','Can update online','Cannot fly if not updated'],tips:'Simple question — answer concisely and move on.',dontSay:'Don\'t say you need a new certificate — you just update the address.',ifUnsure:'§61.60 — address change notification.',followUps:[{q:'What happens if you fly without updating your address?',a:'You may not exercise the privileges of your certificate. It\'s a regulatory violation.',tip:'Short answer is fine here.'}]},
+// === AIRWORTHINESS ===
+{id:'aw1',topic:'Airworthiness',q:'What documents are required on board the aircraft before flight?',a:'ARROW: Airworthiness certificate (displayed visible to passengers/crew), Registration certificate, Radio station license (international flights only), Operating limitations (POH/AFM, placards, markings), Weight and balance data (current).',ref:'14 CFR §91.203, §91.9',diff:'core',tags:['likely'],keyPoints:['Airworthiness certificate (displayed)','Registration','Radio license (international)','Operating limitations/POH','Weight & balance data'],tips:'Use the ARROW mnemonic confidently. DPEs love seeing mnemonics used correctly.',dontSay:'Don\'t say "logbooks" — logbooks are NOT required on board for normal flight.',ifUnsure:'Say: "I know ARROW — let me walk through each letter."',followUps:[{q:'Where must the airworthiness certificate be displayed?',a:'At the cabin or cockpit entrance so it\'s legible to passengers or crew.',tip:'This is a very common follow-up.'}]},
+
+{id:'aw2',topic:'Airworthiness',q:'For an aircraft to be airworthy, what two conditions must be met?',a:'1) Must conform to its approved type design — original or approved parts, modifications per STCs or field approvals. 2) Must be in a condition for safe operation — inspections current, maintenance up to date, no known unsafe defects.',ref:'14 CFR §3.5',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Conforms to type design','Condition for safe operation','Type certificate compliance','Current inspections','No known defects'],tips:'These two conditions are fundamental. State them clearly as a two-part test.',dontSay:'Don\'t just say "it\'s been inspected." That only covers condition for safe operation, not type design conformity.',ifUnsure:'"Airworthiness has two prongs — type design conformity and condition for safe operation."',followUps:[{q:'Who is responsible for determining airworthiness before each flight?',a:'The PIC. Per §91.7, no person may operate a civil aircraft unless it is in an airworthy condition, and the PIC is responsible for that determination.',tip:'Always emphasize PIC responsibility — DPEs want to see you own this.'}]},
+
+{id:'aw3',topic:'Airworthiness',q:'What required inspections must be current? How do you remember them?',a:'AV1ATE: Annual (12 calendar months), VOR check (30 days, IFR only), 100-hour (only if for hire/instruction for hire), Airworthiness Directives (per AD schedule), Transponder (24 calendar months), ELT (12 calendar months, battery at 50% life or 1 hr cumulative use). Also static system/altimeter check every 24 months for IFR.',ref:'14 CFR §91.409, §91.413, §91.207',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Annual (12 cal months)','VOR (30 days, IFR)','100-hour (for hire only)','ADs complied with','Transponder (24 cal months)','ELT (12 cal months)'],tips:'Use AV1ATE confidently. Clarify that 100-hour only applies if aircraft is used for hire.',dontSay:'Don\'t say the 100-hour is always required — it\'s only for hire/flight instruction for hire.',ifUnsure:'"I use the mnemonic AV1ATE to remember required inspections — let me walk through it."',followUps:[{q:'What\'s the difference between an annual and a 100-hour inspection?',a:'Scope is the same — both are complete inspections per Part 43 Appendix D. Difference: annual can only be signed off by an IA (Inspection Authorization), while a 100-hour can be done by any A&P mechanic. Annual is required for all aircraft; 100-hour only for hire.',tip:'Know this distinction — it\'s frequently tested.'}]},
+
+{id:'aw4',topic:'Airworthiness',q:'Can you fly the aircraft if an instrument or piece of equipment is inoperative?',a:'Per §91.213 decision tree: 1) Is there an MEL approved for this aircraft? Most GA aircraft do NOT have one. 2) If no MEL: Is the item required by the type certificate, equipment list, or applicable AD? 3) Is it required by §91.205 for this type of flight (day VFR, night VFR)? 4) Is it required by any other regulation? If NOT required by any of these, deactivate/remove it, placard "INOPERATIVE," make a logbook entry, and the flight can proceed.',ref:'14 CFR §91.213',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Check for MEL first','Type certificate requirements','§91.205 equipment list','Placard INOPERATIVE','Logbook entry required','Four-step decision tree'],tips:'Walk through the decision tree step by step. This is a DPE favorite — they want to see the logical process.',dontSay:'Don\'t just say "you can\'t fly with anything broken." The whole point of §91.213 is that sometimes you CAN.',ifUnsure:'"I\'d work through the §91.213 decision tree — it\'s a four-step process."',followUps:[{q:'Your position lights are burned out. Can you fly during the day?',a:'Work through §91.213: no MEL, not required by type certificate for day flight, §91.205(b) does NOT list position lights for day VFR, no other reg requires them for day. So yes — placard them INOP, logbook entry, and fly day VFR.',tip:'Apply the decision tree to a specific scenario — shows mastery.'}]},
+
+{id:'aw5',topic:'Airworthiness',q:'What instruments and equipment are required for day VFR flight?',a:'A TOMATO FLAMES: Airspeed indicator, Tachometer, Oil pressure gauge, Manifold pressure gauge (if applicable), Altimeter, Temperature gauge (liquid-cooled), Oil temperature (air-cooled), Fuel gauge for each tank, Landing gear position indicator (if retractable), Anti-collision lights (post-3/11/96), Magnetic compass, ELT (with exceptions), Seatbelts (shoulder harness post-1978).',ref:'14 CFR §91.205(b)',diff:'core',tags:['likely'],keyPoints:['Airspeed indicator','Tachometer','Oil pressure','Altimeter','Fuel gauges','Magnetic compass','ELT','Anti-collision lights','Seatbelts'],tips:'Use the mnemonic. For C172S specifically, note: no manifold pressure gauge (fixed-pitch prop) and no landing gear indicator (fixed gear).',dontSay:'Don\'t include items that don\'t apply to your aircraft — shows you know YOUR plane.',ifUnsure:'"§91.205(b) lists day VFR requirements — I use A TOMATO FLAMES."',followUps:[{q:'What additional equipment is needed for night VFR?',a:'FLAPS: Fuses (spare set or 3 of each kind), Landing light (if for hire), Anti-collision lights, Position lights (nav lights), Source of electrical energy.',tip:'Know both day and night cold.'}]},
+
+{id:'aw6',topic:'Airworthiness',q:'What is an Airworthiness Directive?',a:'ADs are legally enforceable regulations issued by FAA to correct unsafe conditions found in aircraft, engines, propellers, or appliances. Two types: Emergency ADs require immediate compliance; non-emergency ADs have a compliance timeframe. Compliance is mandatory for airworthiness. Found in aircraft maintenance records.',ref:'14 CFR Part 39',diff:'common',tags:['likely','dpe-focus'],keyPoints:['Legally enforceable regulations','Correct unsafe conditions','Emergency vs non-emergency types','Compliance is mandatory','Documented in maintenance records'],tips:'Emphasize that ADs are NOT optional — they\'re regulations, not recommendations.',dontSay:'Don\'t confuse ADs with Service Bulletins — SBs are manufacturer recommendations, ADs are FAA mandates.',ifUnsure:'"ADs are covered in Part 39 — they\'re mandatory corrections for unsafe conditions."',followUps:[{q:'How would you check if all ADs are complied with on this aircraft?',a:'Review the aircraft, engine, and propeller logbooks. Each AD compliance should be documented with the AD number, compliance method, date, and mechanic signature.',tip:'Show you know where to FIND the information.'}]},
+
+{id:'aw7',topic:'Airworthiness',q:'Walk me through reviewing the maintenance records for this aircraft.',a:'I would check: 1) Aircraft logbook — annual inspection current (within 12 calendar months), no open squawks; 2) Engine logbook — TBO status, oil changes, compression checks; 3) Propeller logbook — AD compliance; 4) All ADs complied with (recurring and one-time); 5) Transponder check within 24 calendar months; 6) ELT inspection within 12 months, battery current; 7) All entries signed by appropriately rated mechanics (IA for annual return-to-service); 8) Equipment list current.',ref:'14 CFR §91.409, §91.417 — DPE FOCUS',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Annual inspection current','AD compliance verified','Transponder check current','ELT inspection current','Entries properly signed','Equipment list current'],tips:'Be systematic — go logbook by logbook. Shows organization and thoroughness.',dontSay:'Don\'t say "I trust my mechanic" — show the DPE YOU can verify these items.',ifUnsure:'"I\'d review each logbook systematically — aircraft, engine, prop — checking dates and signatures."',followUps:[{q:'What is a Type Certificate Data Sheet and why does it matter?',a:'The TCDS describes the type design — approved engine, prop, weight limits, fuel type, equipment. It defines what the aircraft SHOULD be to conform to its type certificate.',tip:'Connects back to the two conditions for airworthiness.'}]},
+
+{id:'aw8',topic:'Airworthiness',q:'What is preventive maintenance and can you as a pilot perform it?',a:'Per Part 43 Appendix A, a certificated pilot may perform certain preventive maintenance on aircraft they own or operate (not air carrier). Examples: replenishing hydraulic fluid, servicing wheel bearings, replacing safety belts, changing tires, replacing bulbs/lenses for position and landing lights, cleaning/replacing spark plugs, changing oil. Must make logbook entry with description, date, signature, and certificate number.',ref:'14 CFR §43.3(g), §43 Appendix A',diff:'common',tags:[],keyPoints:['Pilot can perform on owned/operated aircraft','Not air carrier operations','Specific tasks listed in Appendix A','Must log the work','Sign with certificate number'],tips:'Give 2-3 specific examples of what you CAN do.',dontSay:'Don\'t overstate what you can do — you can\'t do structural repairs or engine work beyond oil changes.',ifUnsure:'"Part 43 Appendix A lists the specific preventive maintenance items a pilot can perform."',followUps:[{q:'Give me an example of something you could do and something you could NOT do.',a:'Could: change oil, replace a landing light bulb, change a tire. Could NOT: replace a cylinder, adjust flight controls, perform an annual inspection.',tip:'Concrete examples show practical knowledge.'}]},
+// === WEATHER ===
+{id:'wx1',topic:'Weather',q:'Walk me through the weather products you\'d check for a cross-country flight.',a:'Systematic approach: 1) METARs/SPECIs for current conditions at departure, enroute, destination; 2) TAFs for terminal forecasts; 3) Area Forecast Discussion for trends; 4) PIREPs for actual conditions aloft; 5) AIRMETs/SIGMETs for significant weather; 6) Winds and Temps Aloft for planning; 7) Surface analysis and prog charts for fronts; 8) Radar/satellite for precipitation and clouds; 9) NOTAMs for TFRs. Get a standard briefing from 1800wxbrief or FSS.',ref:'AIM 7-1',diff:'core',tags:['likely'],keyPoints:['METARs for current conditions','TAFs for forecasts','PIREPs for pilot reports','AIRMETs/SIGMETs','Winds aloft','Standard briefing from FSS'],tips:'Show a systematic process — start current, then forecast, then big picture.',dontSay:'Don\'t say "I\'d just check ForeFlight" — mention the actual weather products by name.',ifUnsure:'"I\'d get a standard briefing from FSS which covers all required weather products."',followUps:[{q:'What are the three types of weather briefings?',a:'Standard (complete, no prior info), Abbreviated (supplement/update previous briefing), Outlook (departure 6+ hours away).',tip:'Know when to use each type.'}]},
+
+{id:'wx2',topic:'Weather',q:'Decode this METAR: KATL 191553Z 27012G20KT 10SM FEW045 SCT250 18/06 A3012',a:'Atlanta, 19th at 1553Z. Winds 270° at 12 gusting 20 knots. Visibility 10 SM. Few clouds at 4,500 AGL, scattered at 25,000 AGL. Temp 18°C, dewpoint 6°C (spread of 12° — no fog concern). Altimeter 30.12 in Hg. Good VFR day, but note the gusting crosswind for the C172S.',ref:'AIM 7-1-30',diff:'core',tags:['likely'],keyPoints:['Station and time identification','Wind direction, speed, gusts','Visibility in statute miles','Cloud layers in AGL','Temperature/dewpoint spread','Altimeter setting'],tips:'Decode systematically left to right. Mention the temp/dew point spread — shows weather savvy.',dontSay:'Don\'t confuse AGL (cloud heights in METARs) with MSL. METAR clouds are always AGL.',ifUnsure:'"METARs follow a standard format — let me decode each element left to right."',followUps:[{q:'The temp is 18 and dewpoint is 6. What does that tell you?',a:'The spread is 12°C, so no fog or low cloud concerns. When spread narrows to 2-3°C, expect fog or low clouds forming. Temp/dewpoint converge at roughly 2.5°C per 1,000 feet of altitude gain.',tip:'Knowing the 2.5°/1000ft rule impresses DPEs.'}]},
+
+{id:'wx3',topic:'Weather',q:'What\'s the difference between a SIGMET, AIRMET, and Convective SIGMET?',a:'SIGMET: hazardous to ALL aircraft — severe icing (not thunderstorm), severe/extreme turbulence, volcanic ash, dust/sandstorms <3SM. Valid 4 hours. AIRMET: hazardous mainly to light aircraft — moderate icing (Zulu), moderate turbulence/30kt surface winds (Tango), IFR/mountain obscuration (Sierra). Valid 6 hours. Convective SIGMET: thunderstorm-specific — tornadoes, lines of TS, embedded TS, hail ≥3/4 inch, heavy precip affecting 40%+ area. Valid 2 hours.',ref:'AIM 7-1-6',diff:'core',tags:['likely'],keyPoints:['SIGMET = all aircraft, severe hazards','AIRMET = light aircraft, moderate hazards','Convective SIGMET = thunderstorm specific','AIRMET types: Zulu, Tango, Sierra','Different validity periods'],tips:'Know the three AIRMET types by letter — Zulu/Tango/Sierra. DPEs often ask specifically.',dontSay:'Don\'t confuse which hazards go with which advisory. SIGMETs are SEVERE, AIRMETs are MODERATE.',ifUnsure:'"AIRMETs use letters — Zulu for icing, Tango for turbulence, Sierra for IFR and mountain obscuration."',followUps:[{q:'You see an AIRMET Tango issued for your route. What does that mean?',a:'Moderate turbulence and/or sustained surface winds of 30+ knots. As a C172S pilot, this is significant — consider delaying or finding alternate route.',tip:'Relate it to YOUR aircraft and decision-making.'}]},
+
+{id:'wx4',topic:'Weather',q:'Describe warm front vs cold front characteristics and associated weather.',a:'Warm front: warm air overrides retreating cold air. Gradual slope (~1:200). Clouds in sequence: cirrus, cirrostratus, altostratus, nimbostratus, stratus. Steady widespread precipitation, gradually decreasing visibility, possible fog. Slow-moving. Cold front: cold air wedges under warm air. Steep slope (~1:50). Rapid weather changes, cumuliform clouds, heavy but brief precipitation, possible thunderstorms, turbulence. Visibility improves quickly after passage. Faster-moving than warm fronts.',ref:'FAA-H-8083-25B Ch.12',diff:'common',tags:['likely'],keyPoints:['Warm front: gradual slope, steady precipitation','Cold front: steep slope, brief heavy precipitation','Warm front cloud sequence (Ci, Cs, As, Ns, St)','Cold front: cumuliform clouds, thunderstorms possible','Cold fronts move faster'],tips:'Compare and contrast — DPEs like seeing you understand BOTH and can distinguish them.',dontSay:'Don\'t mix up which front has which cloud types — warm = stratiform layers, cold = cumuliform towers.',ifUnsure:'"I think of warm fronts as gentle and widespread, cold fronts as violent and brief."',followUps:[{q:'Which type of front is more dangerous and why?',a:'Cold fronts are generally more hazardous due to rapid weather changes, embedded thunderstorms, severe turbulence, and wind shear. But warm fronts can trap you in prolonged low IFR — both require respect.',tip:'Show nuance — both are dangerous in different ways.'}]},
+
+{id:'wx5',topic:'Weather',q:'What conditions are necessary for thunderstorm formation? Describe the stages.',a:'Three ingredients: sufficient moisture, unstable lapse rate (temp decreases rapidly with altitude), and a lifting action (fronts, orographic, convective heating). Three stages: 1) Cumulus/building — updrafts only, no precipitation reaching ground; 2) Mature — most dangerous: updrafts AND downdrafts, heavy rain, hail, lightning, worst turbulence, possible tornadoes; 3) Dissipating — predominantly downdrafts, light rain, anvil spreads out.',ref:'FAA-H-8083-25B Ch.12',diff:'core',tags:['likely'],keyPoints:['Moisture + instability + lifting action','Cumulus stage: updrafts only','Mature stage: most dangerous','Dissipating stage: downdrafts dominate','Hail, lightning, turbulence in mature'],tips:'Name all three ingredients AND all three stages. This is tested very frequently.',dontSay:'Don\'t minimize thunderstorm hazards. Never say "I could fly near one." The recommendation is stay 20NM from severe TS.',ifUnsure:'"Three ingredients and three stages — moisture, instability, lifting, then building, mature, dissipating."',followUps:[{q:'What is the recommended avoidance distance from a thunderstorm?',a:'At least 20 NM from severe thunderstorms, avoid flying under the anvil. Never attempt to fly under, between, or through thunderstorms in a C172S.',tip:'Emphasize conservative decision-making.'}]},
+
+{id:'wx6',topic:'Weather',q:'What types of icing might you encounter and what are the hazards?',a:'Clear ice: forms just below freezing with large supercooled droplets. Glossy, transparent, hard to remove — heaviest and most dangerous. Rime ice: colder temps, small droplets. White, rough, opaque, brittle — disrupts airflow but easier to remove. Mixed ice: combination. Hazards: increased weight, disrupted airflow (higher stall speed, less lift), blocked pitot/static, restricted controls, reduced engine performance. The C172S is NOT approved for known icing.',ref:'FAA-H-8083-25B Ch.12, AC 91-74',diff:'core',tags:['likely'],keyPoints:['Clear ice: glossy, heaviest, most dangerous','Rime ice: white, rough, brittle','C172S NOT approved for known icing','Increases stall speed','Can block pitot/static system'],tips:'Immediately state your aircraft is NOT approved for icing. Shows risk awareness.',dontSay:'Don\'t suggest you could "handle a little icing." Even trace icing degrades performance significantly in a C172S.',ifUnsure:'"Clear, rime, and mixed — each forms under different conditions, all hazardous to the C172S."',followUps:[{q:'What would you do if you encountered icing in flight?',a:'Immediate action: exit the icing conditions — change altitude, turn around, or divert. Request pilot reports from ATC, activate pitot heat, and land as soon as practical.',tip:'The answer is always GET OUT — never try to tough it out.'}]},
+
+{id:'wx7',topic:'Weather',q:'What is density altitude and how does it affect your C172S?',a:'Density altitude is pressure altitude corrected for nonstandard temperature. Represents the altitude at which current air density matches standard atmosphere. High DA (hot, high, humid) = thinner air = degraded performance: longer takeoff roll, reduced climb rate, higher true airspeed for same indicated, less engine power. On a 95°F day at 3,000 ft elevation, DA could be 6,000+ feet — takeoff roll increases dramatically.',ref:'FAA-H-8083-25B Ch.11, C172S POH',diff:'core',tags:['likely'],keyPoints:['Pressure altitude corrected for temperature','Hot/high/humid = high DA','Longer takeoff and landing distances','Reduced rate of climb','Less engine power output','Use POH performance charts'],tips:'Give a SPECIFIC example with numbers. "On a 95°F day at 3,000 feet, DA might be 6,000 feet, doubling my takeoff roll."',dontSay:'Don\'t forget humidity — while not as significant as temp, it does affect DA.',ifUnsure:'"Density altitude is in the performance section of the POH — I\'d calculate it using the chart or my E6B."',followUps:[{q:'How would you mitigate high density altitude on a hot day?',a:'Fly early morning when it\'s cooler, reduce weight, use maximum performance takeoff technique, ensure adequate runway length, lean mixture for best power at altitude.',tip:'Practical mitigations show real-world thinking.'}]},
+
+{id:'wx8',topic:'Weather',q:'How would you make a go/no-go decision for a VFR cross-country?',a:'Use PAVE: Pilot (I\'M SAFE, currency, proficiency), Aircraft (performance, equipment, fuel), enVironment (weather, terrain, airports, airspace), External pressures (schedule, passengers, peer pressure). For weather: check conditions meet VFR minimums AND my personal minimums along entire route; look at trends (improving/deteriorating); check for convective activity, fronts, icing; identify divert airports. Apply 1-2-3 rule. If in doubt, don\'t go — "it\'s better to be on the ground wishing you were flying."',ref:'ACS Risk Management',diff:'core',tags:['likely'],keyPoints:['PAVE framework','Personal minimums above VFR minimums','Check trends, not just current conditions','Identify divert airports','External pressure awareness','Conservative decision-making'],tips:'This is a judgment question. Show maturity and conservative decision-making. Mention personal minimums.',dontSay:'Don\'t say "if it\'s VFR, I\'d go." Show that you think deeper than minimum legal requirements.',ifUnsure:'"I use the PAVE checklist to systematically evaluate each risk factor."',followUps:[{q:'What external pressures might influence a bad go/no-go decision?',a:'Get-there-itis, passengers expecting to arrive, schedule pressure, desire to not waste money on a canceled flight, peer pressure. Recognize these as hazardous attitudes and have a plan to resist them.',tip:'Self-awareness about external pressures impresses DPEs enormously.'}]},
+// === CROSS-COUNTRY PLANNING ===
+{id:'xc1',topic:'Cross-Country Planning',q:'Walk me through how you would plan a VFR cross-country.',a:'1) Weather — standard briefing; 2) Route — mark on sectional, checkpoints every 10-15 miles; 3) NOTAMs and TFRs; 4) Measure true course with plotter; 5) Winds aloft — calculate WCA and ground speed; 6) Heading conversion: TC ± WCA = TH ± variation = MH ± deviation = CH; 7) Fuel burn, time enroute; 8) Weight and balance; 9) Performance charts — takeoff/landing distances; 10) File VFR flight plan if desired; 11) Complete nav log; 12) Brief passengers.',ref:'FAA-H-8083-25B Ch.16',diff:'core',tags:['likely'],keyPoints:['Weather briefing first','Route with checkpoints','NOTAMs/TFRs','Wind correction and headings','Weight & balance','Performance charts'],tips:'Walk through it in ORDER. Shows organized thinking.',dontSay:'Don\'t skip weight and balance or performance charts — DPEs specifically look for these.',ifUnsure:'"My planning process follows a checklist — weather, route, NOTAMs, navigation, W&B, performance."',followUps:[{q:'What preflight action is required by §91.103?',a:'Become familiar with ALL available information concerning the flight. For any flight: weather, fuel requirements, alternatives if flight can\'t be completed. For flights not in vicinity: runway lengths, takeoff/landing distances.',tip:'§91.103 is a catch-all — know it well.'}]},
+
+{id:'xc2',topic:'Cross-Country Planning',q:'How do you determine appropriate VFR cruising altitude?',a:'Per §91.159, above 3,000 AGL: magnetic course 0-179° (eastbound) = odd thousands + 500 (3,500, 5,500, 7,500). Magnetic course 180-359° (westbound) = even thousands + 500 (4,500, 6,500, 8,500). Based on MAGNETIC course, not heading. Below 3,000 AGL, no regulatory altitude — choose based on terrain, weather, airspace.',ref:'14 CFR §91.159',diff:'core',tags:['likely'],keyPoints:['Above 3,000 AGL rule','Eastbound = odd + 500','Westbound = even + 500','Based on MAGNETIC course','Below 3,000 AGL = no requirement'],tips:'Emphasize MAGNETIC course, not heading or true course. Common mistake.',dontSay:'Don\'t say "heading" when you mean "course." They\'re different — course is ground track, heading includes wind correction.',ifUnsure:'"§91.159 covers VFR cruising altitudes — odd plus 500 east, even plus 500 west."',followUps:[{q:'Your magnetic course is 180°. What altitude do you use?',a:'180° is westbound (180-359 range), so even thousands + 500: 4,500, 6,500, etc.',tip:'Be careful — 180° is the START of the westbound range.'}]},
+
+{id:'xc3',topic:'Cross-Country Planning',q:'Walk me through a weight and balance calculation for our flight today.',a:'C172S: 1) Basic empty weight from THIS aircraft\'s W&B data (~1,663 lbs); 2) Add front seat occupants at front seat arm (~37 in); 3) Add rear passengers at rear arm (~73 in); 4) Fuel: 56 gal × 6 lbs/gal = 336 lbs at fuel arm (~48 in); 5) Baggage at baggage arm (~95 in), max 120 lbs; 6) Total ≤ 2,550 lbs max gross; 7) Calculate total moment ÷ total weight = CG position; 8) Plot on CG envelope — within forward and aft limits; 9) Check at landing weight too (fuel burn shifts CG aft).',ref:'C172S POH Section 6 — DPE FOCUS',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Start with basic empty weight','Add each station weight × arm','Max gross 2,550 lbs','CG must be within envelope','Check at takeoff AND landing','Use THIS aircraft\'s specific data'],tips:'Use actual numbers from the POH. Having done a real calculation shows preparedness.',dontSay:'Don\'t use generic numbers — always reference THIS aircraft\'s specific empty weight.',ifUnsure:'"I\'d use the POH Section 6 loading graph and CG envelope chart."',followUps:[{q:'What happens if CG is too far aft?',a:'Aircraft becomes less stable, more prone to stall/spin, lighter controls (possibly too sensitive), potential inability to recover from stalls. AFT CG IS MORE DANGEROUS than forward CG.',tip:'Always emphasize that aft CG is the dangerous one.'}]},
+
+{id:'xc4',topic:'Cross-Country Planning',q:'What is the fuel capacity of the C172S and how do you plan fuel reserves?',a:'56 gallons total, 53 usable. Burn rate ~8.5-10 GPH depending on power setting. For reserves: §91.151 requires enough fuel to fly to destination plus 30 minutes day VFR or 45 minutes night VFR at normal cruise. Personally I plan for 1 hour reserve minimum. Calculate: total usable minus taxi fuel minus enroute fuel = reserve. If below personal minimum, plan a fuel stop.',ref:'14 CFR §91.151, C172S POH',diff:'core',tags:['likely'],keyPoints:['56 gallons total, 53 usable','8.5-10 GPH burn rate','30 min day VFR reserve (legal)','45 min night VFR reserve (legal)','Personal minimum should exceed legal'],tips:'State both the legal requirement AND your personal minimum. Shows maturity.',dontSay:'Don\'t say "30 minutes is enough." Show you build in extra margin.',ifUnsure:'"§91.151 covers fuel requirements — 30 minutes day VFR, 45 minutes night VFR."',followUps:[{q:'You calculate 45 minutes of fuel remaining at destination. Is that enough for a day flight?',a:'Legally yes (30 min required), but it\'s below my personal minimum. I\'d plan a fuel stop to build more margin, especially considering possible diversions or delays.',tip:'The right answer prioritizes safety over minimums.'}]},
+
+{id:'xc5',topic:'Cross-Country Planning',q:'Explain how you convert from true course to compass heading.',a:'True Course (measured on chart) → ± Wind Correction Angle = True Heading → ± Magnetic Variation (from isogonic lines: East is least/subtract, West is best/add) = Magnetic Heading → ± Compass Deviation (from correction card) = Compass Heading. Remember: "True Virgins Make Dull Company" or "Can Dead Men Vote Twice."',ref:'FAA-H-8083-25B Ch.16',diff:'core',tags:['likely'],keyPoints:['TC ± WCA = TH','TH ± variation = MH','MH ± deviation = CH','East variation subtract','West variation add','Deviation from compass card'],tips:'Use the mnemonic and walk through each step. Be precise about which way to apply variation.',dontSay:'Don\'t confuse variation with deviation — variation is from the chart, deviation is from the compass card in the aircraft.',ifUnsure:'"I use the mnemonic: True Virgins Make Dull Company — TC, Variation, MH, Deviation, CH."',followUps:[{q:'The variation is 5°W and your true heading is 090°. What\'s your magnetic heading?',a:'West is best — ADD: 090 + 5 = 095° magnetic heading.',tip:'Practice quick mental math on these.'}]},
+
+{id:'xc6',topic:'Cross-Country Planning',q:'What are NOTAMs and TFRs and how do you check for them?',a:'NOTAMs provide time-critical aeronautical info: runway closures, navaid outages, taxiway changes. TFRs temporarily restrict flight in defined areas (Presidential, sporting events, disasters, space launches). Check: tfr.faa.gov, 1800wxbrief.com, ForeFlight, FSS briefing. ALWAYS check TFRs immediately before EVERY flight. Consequences of busting a TFR: certificate action, civil penalties, possible military intercept.',ref:'AIM 5-1-3, 14 CFR §91.137-145',diff:'core',tags:['likely'],keyPoints:['NOTAMs for airport/airspace changes','TFRs for temporary restrictions','Multiple sources to check','Check immediately before every flight','Severe consequences for TFR violations'],tips:'Emphasize that you check TFRs before EVERY flight, not just cross-countries.',dontSay:'Don\'t say you only check NOTAMs for cross-countries — check for every flight.',ifUnsure:'"I check tfr.faa.gov and 1800wxbrief.com before every flight."',followUps:[{q:'What would happen if you accidentally flew through a Presidential TFR?',a:'Possible military intercept, certificate suspension or revocation, civil penalties up to $100,000, potential criminal charges. This is taken extremely seriously post-9/11.',tip:'The seriousness of your answer shows you understand the stakes.'}]},
+
+// === PERFORMANCE & LIMITATIONS ===
+{id:'pl1',topic:'Performance & Limitations',q:'What are the key V-speeds for the C172S?',a:'Vs0 (stall, landing config): ~48 KIAS. Vs1 (stall, clean): ~53 KIAS. Vr (rotation): ~55 KIAS. Vx (best angle): ~62 KIAS. Vy (best rate): ~74 KIAS. Va (maneuvering): ~105 KIAS at max gross — decreases with lighter weight. Vfe (max flaps): ~110 KIAS (10°), ~85 KIAS (full). Vno (max structural cruise): ~129 KIAS. Vne (never exceed): ~163 KIAS. Always verify in YOUR POH.',ref:'C172S POH Section 2 & 4',diff:'core',tags:['likely'],keyPoints:['Vs0 ~48, Vs1 ~53','Vx ~62 (best angle)','Vy ~74 (best rate)','Va ~105 at max gross','Vno ~129, Vne ~163'],tips:'Know Vx vs Vy — angle vs rate. "X goes up" (angle), "Y goes out" (rate). Be ready to explain when you\'d use each.',dontSay:'Don\'t quote speeds without saying "approximately" — exact values vary by weight and conditions.',ifUnsure:'"V-speeds are in POH Section 2. The key ones for the C172S are..."',followUps:[{q:'When would you use Vx vs Vy?',a:'Vx (best angle, ~62 kts) for obstacle clearance on takeoff — steepest climb angle. Vy (best rate, ~74 kts) for normal climb — most altitude gained per unit of time.',tip:'Classic question — know the distinction cold.'}]},
+
+{id:'pl2',topic:'Performance & Limitations',q:'Explain maneuvering speed (Va) and why it changes with weight.',a:'Va is the max speed for full/abrupt control inputs without exceeding structural limits. At or below Va, the wing stalls before the structure breaks. Va DECREASES with lighter weight because a lighter airplane reaches its limit load factor at a lower speed. At max gross (2,550 lbs): ~105 KIAS. At lighter weights: lower. In turbulence, slow to at or below Va. Va is NOT on the airspeed indicator.',ref:'SAIB CE-11-17, C172S POH',diff:'core',tags:['likely'],keyPoints:['Max speed for full control deflection','Wing stalls before structure fails','Decreases with lighter weight','~105 KIAS at max gross','Slow to Va in turbulence','Not marked on ASI'],tips:'The "why it changes with weight" part is what separates good answers from great ones. Explain the physics.',dontSay:'Don\'t say Va is a fixed number — always qualify it with "at max gross weight."',ifUnsure:'"Va is tied to load factor limits — I\'d reference the POH for the exact speed at our weight."',followUps:[{q:'You hit severe turbulence at 120 knots. What do you do?',a:'Immediately reduce to Va or below (~105 at max gross, less at lighter weight). Maintain wings level, don\'t chase altitude. Ride it out. Attempt to exit the turbulence by changing altitude or heading.',tip:'Emphasize the immediate power/speed reduction.'}]},
+
+{id:'pl3',topic:'Performance & Limitations',q:'What do the color arcs on the airspeed indicator mean?',a:'White arc: flap operating range. Lower limit = Vs0 (stall, landing config ~48), upper = Vfe (max flap speed ~110). Green arc: normal operating range. Lower = Vs1 (stall, clean ~53), upper = Vno (max structural cruise ~129). Yellow arc: caution range (~129-163) — only in smooth air. Red line: Vne (never exceed ~163).',ref:'FAA-H-8083-25B Ch.8',diff:'core',tags:['likely'],keyPoints:['White = flap range','Green = normal range','Yellow = caution (smooth air only)','Red line = never exceed','Lower limits are stall speeds'],tips:'Relate each arc to the C172S specific numbers. Shows you know YOUR airplane.',dontSay:'Don\'t say you can fly in the yellow arc anytime — only in smooth, non-turbulent air.',ifUnsure:'"The airspeed indicator arcs are defined in the PHAK Chapter 8."',followUps:[{q:'You\'re flying at 135 KIAS and encounter turbulence. Problem?',a:'Yes — 135 is in the yellow/caution arc, which is only for smooth air. In turbulence, you need to slow to the green arc (below Vno 129) or ideally to Va (~105).',tip:'This connects arcs to practical decision-making.'}]},
+
+{id:'pl4',topic:'Performance & Limitations',q:'What are the load factor limits for the C172S?',a:'Normal category: +3.8G to -1.52G. In a 60° bank turn, load factor is 2.0G — stall speed increases by about 40%. The relationship: 30° = 1.15G, 45° = 1.41G, 60° = 2.0G. At 60° bank, the stall speed that was 53 knots clean becomes roughly 75 knots. This is why steep turns and aggressive maneuvering are dangerous.',ref:'C172S POH, FAA-H-8083-25B Ch.5',diff:'common',tags:['likely'],keyPoints:['+3.8G / -1.52G normal category','Load factor increases in bank','60° bank = 2G = 40% higher stall speed','Relates to Va and structural limits'],tips:'Connect load factor to stall speed increase — that\'s the practical danger.',dontSay:'Don\'t just recite the numbers without explaining WHY load factor matters.',ifUnsure:'"Load factor limits are in the POH — the key point is how bank angle increases both load factor and stall speed."',followUps:[{q:'Why is a steep turn at low altitude particularly dangerous?',a:'Higher load factor = higher stall speed. If you stall in a steep bank at low altitude, there may not be enough altitude to recover. Also, the stall may develop into a spin.',tip:'This tests your understanding of the stall/spin accident chain.'}]},
+
+{id:'pl5',topic:'Performance & Limitations',q:'Walk me through a hot-day, high-altitude takeoff scenario in the C172S.',a:'Example: 95°F at 3,000 ft field elevation. Standard temp at 3,000 is ~50°F, so ~25°C above standard — adds roughly 3,000 feet of DA, total ~6,000 ft. Effects: 50-70% longer ground roll, halved climb rate, less engine power. Mitigations: calculate using POH charts, ensure adequate runway, consider early morning departure, lean mixture for max power, use max performance technique, reduce weight if possible.',ref:'C172S POH Section 5',diff:'core',tags:['likely'],keyPoints:['Calculate density altitude','Longer takeoff and landing rolls','Reduced climb rate','Use POH performance charts','Lean mixture for max power','Consider delaying departure'],tips:'Walk through a specific calculation — numbers make your answer concrete.',dontSay:'Don\'t say "it\'ll be fine, I\'ve done it before." Show you CALCULATE the performance.',ifUnsure:'"I\'d use the POH Section 5 takeoff performance chart with the actual conditions."',followUps:[{q:'How do you lean the mixture for takeoff at a high-altitude airport?',a:'Full rich may be too rich at high DA. Lean for maximum RPM (peak RPM) before takeoff. The POH will specify leaning procedures for high altitude operations.',tip:'Fuel-injected C172S handles this better than carbureted models.'}]},
+// === AIRCRAFT SYSTEMS (C172S) ===
+{id:'sy1',topic:'Aircraft Systems',q:'Describe the engine in your C172S.',a:'Lycoming IO-360-L2A: horizontally-opposed, 4-cylinder, direct-drive, air-cooled, fuel-injected, 180 HP. The "I" means fuel-injected — no carburetor, so no carb ice concern. However, fuel-injected engines are susceptible to vapor lock in hot weather. Four-stroke cycle: intake, compression, power, exhaust.',ref:'C172S POH Section 7',diff:'core',tags:['likely'],keyPoints:['Lycoming IO-360-L2A','180 HP, fuel-injected','Horizontally-opposed, 4-cylinder','Air-cooled','No carburetor (no carb ice)','Susceptible to vapor lock'],tips:'Know what each part of "IO-360-L2A" means. "I" = injected, "O" = opposed, "360" = displacement.',dontSay:'Don\'t say "it has a carburetor" — the C172S is fuel-injected. Some older C172 models (N, P) are carbureted.',ifUnsure:'"Engine details are in POH Section 7."',followUps:[{q:'What\'s the difference between fuel injection and a carburetor?',a:'Carburetor mixes fuel/air before the intake manifold — susceptible to carb ice from venturi cooling. Fuel injection sprays fuel directly at each cylinder — no venturi, no carb ice, but more precise fuel metering and potential for vapor lock.',tip:'Understanding both systems shows depth.'}]},
+
+{id:'sy2',topic:'Aircraft Systems',q:'Walk me through the fuel system.',a:'Two wing tanks, 28 gallons each (56 total, 53 usable). Fuel selector: LEFT, RIGHT, BOTH — normal ops on BOTH. Gravity-fed from tanks through a fuel strainer (lowest point) to engine-driven fuel pump and fuel servo/metering unit, then to injector nozzles at each cylinder. Electric auxiliary fuel pump for priming/backup. Fuel sumps at each tank and strainer for preflight draining. 100LL avgas (blue).',ref:'C172S POH Section 7',diff:'core',tags:['likely'],keyPoints:['56 gal total, 53 usable','LEFT/RIGHT/BOTH selector','Gravity-fed plus engine-driven pump','Auxiliary electric fuel pump','Fuel strainer at lowest point','100LL blue avgas'],tips:'Mention the preflight drain process — shows practical knowledge.',dontSay:'Don\'t forget to mention the auxiliary fuel pump. It\'s critical for engine start and as a backup.',ifUnsure:'"The fuel system schematic is in POH Section 7."',followUps:[{q:'During preflight, what are you checking when you drain the fuel sumps?',a:'Checking for: water contamination (clear, sinks to bottom), correct fuel grade (blue = 100LL), sediment or debris. Drain each sump until clean avgas appears.',tip:'Actually describe what you\'re looking at and looking FOR.'}]},
+
+{id:'sy3',topic:'Aircraft Systems',q:'Describe the electrical system.',a:'28-volt DC system. Engine-driven alternator (28V, primary source when running). 24-volt battery (starting, backup if alternator fails). Master switch has two halves: battery and alternator (independently operable). Voltage regulator prevents overcharging. Ammeter shows charge/discharge. Circuit breakers (resettable). Avionics master switch protects avionics during start. If alternator fails: battery gives roughly 30-60 min depending on load — reduce load, land as soon as practical.',ref:'C172S POH Section 7',diff:'core',tags:['likely','dpe-focus'],keyPoints:['28V DC system','Alternator = primary power','24V battery = backup','Split master switch','Circuit breakers (resettable)','Avionics master switch'],tips:'Explain what you\'d do if the ammeter shows discharge — that indicates alternator failure.',dontSay:'Don\'t say "generator" — C172S has an alternator, not a generator. They work differently.',ifUnsure:'"Electrical system details are in POH Section 7."',followUps:[{q:'You notice the ammeter showing a discharge in flight. What do you do?',a:'Alternator has likely failed. Check alternator breaker, try cycling alternator half of master switch. If no recovery: shed electrical load (non-essential avionics, lights), plan to land soon — battery has limited life. Prioritize navigation and communication.',tip:'Walk through troubleshooting AND the plan if it doesn\'t work.'}]},
+
+{id:'sy4',topic:'Aircraft Systems',q:'Explain the pitot-static system and what instruments it powers.',a:'Three instruments: Airspeed indicator (pitot + static pressure — measures difference), Altimeter (static only — measures atmospheric pressure), VSI (static through calibrated leak — shows rate of change). Pitot tube faces forward for ram air; static port(s) sense ambient pressure. Blockages: blocked pitot with open drain = ASI reads zero; blocked pitot and drain = ASI acts like altimeter; blocked static = altimeter freezes, VSI zero, ASI inaccurate. C172S has alternate static source inside cockpit.',ref:'FAA-H-8083-25B Ch.8, C172S POH',diff:'core',tags:['likely'],keyPoints:['ASI uses pitot AND static','Altimeter uses static only','VSI uses static with calibrated leak','Alternate static source available','Know blockage symptoms'],tips:'DPEs love asking about blockage scenarios. Know what each instrument does when pitot or static is blocked.',dontSay:'Don\'t confuse which instruments use pitot vs static. Only the ASI uses pitot pressure.',ifUnsure:'"The pitot-static system is covered in PHAK Chapter 8."',followUps:[{q:'What happens to the altimeter if the static port ices over?',a:'It freezes at the altitude where blockage occurred — won\'t change with altitude changes. Use alternate static source. Note: alternate static reads slightly higher due to lower cockpit pressure.',tip:'Know the alternate static source and its error tendency.'}]},
+
+{id:'sy5',topic:'Aircraft Systems',q:'How does the vacuum system work and what does it drive?',a:'Engine-driven vacuum pump creates suction spinning gyroscopes in: attitude indicator and heading indicator. Vacuum gauge should read 4.5-5.5 in Hg. Turn coordinator is ELECTRICALLY driven (separate power source). If vacuum fails: attitude and heading indicators become unreliable. Use magnetic compass + turn coordinator as backups — this is why the turn coordinator has a separate power source.',ref:'FAA-H-8083-25B Ch.8, C172S POH',diff:'core',tags:['likely'],keyPoints:['Drives attitude and heading indicators','Turn coordinator is ELECTRIC (separate)','4.5-5.5 in Hg normal range','Vacuum failure = AI and HI unreliable','Compass + turn coordinator as backup'],tips:'The key insight is that the turn coordinator is ELECTRICALLY driven. This is your backup attitude reference.',dontSay:'Don\'t say the turn coordinator is vacuum-driven — it\'s electric, and that distinction matters for failure scenarios.',ifUnsure:'"The vacuum system powers the gyroscopic instruments described in POH Section 7."',followUps:[{q:'Your vacuum gauge reads zero in flight. What instruments are affected?',a:'Attitude indicator and heading indicator will slowly become unreliable. Turn coordinator still works (electric). Transition to magnetic compass for heading and turn coordinator for wings level.',tip:'This is a practical emergency — know the backup strategy.'}]},
+
+{id:'sy6',topic:'Aircraft Systems',q:'Describe the ignition system.',a:'Dual magneto system — two independent magnetos (left and right), each powering its own set of spark plugs in all 4 cylinders. Each cylinder has 2 spark plugs. Key features: completely independent of electrical system (engine runs with total electrical failure). Magneto switch: OFF, R, L, BOTH, START. During runup: check each mag individually — max drop 125 RPM, max difference between mags 50 RPM.',ref:'C172S POH Section 7',diff:'core',tags:['likely'],keyPoints:['Dual independent magnetos','Each cylinder has 2 spark plugs','Independent of electrical system','Runup check: max 125 RPM drop','Max 50 RPM difference between mags','BOTH for normal operation'],tips:'Emphasize redundancy — "even with complete electrical failure, the engine keeps running."',dontSay:'Don\'t say magnetos need battery power — they\'re self-generating. That\'s the whole point.',ifUnsure:'"The ignition system is covered in POH Section 7."',followUps:[{q:'Why is it important to check that mags are grounded during shutdown?',a:'A "hot" mag means the engine could fire if the propeller is moved by hand. Always verify mags go to OFF and observe RPM drop. A hot mag is extremely dangerous around maintenance.',tip:'This is a safety-critical item — take it seriously.'}]},
+
+{id:'sy7',topic:'Aircraft Systems',q:'How does the magnetic compass work and what errors does it have?',a:'Magnetized needle on a float in liquid aligns with Earth\'s magnetic field. Errors: 1) Variation — difference between true and magnetic north (isogonic lines on chart). 2) Deviation — aircraft metals/electronics (compass correction card). 3) Turning errors: UNDS/NOSE — in northern hemisphere, turning to North it Undershoot, to South it Overshoots. Roll out early for north, late for south. 4) Acceleration errors: ANDS — on E/W headings, Accelerate shows North, Decelerate shows South. Only accurate in straight, unaccelerated flight.',ref:'FAA-H-8083-25B Ch.8',diff:'core',tags:['likely'],keyPoints:['Variation (chart isogonic lines)','Deviation (compass correction card)','UNDS turning error','ANDS acceleration error','Only accurate straight & unaccelerated'],tips:'Know UNDS and ANDS cold. DPEs will give you scenarios to test this.',dontSay:'Don\'t confuse turning and acceleration errors — they\'re different phenomena.',ifUnsure:'"Compass errors are covered in PHAK Chapter 8 — I remember the mnemonics UNDS and ANDS."',followUps:[{q:'You\'re on a heading of east and accelerate. What does the compass show?',a:'ANDS — Accelerate shows North. The compass will briefly swing toward north, giving a false indication of a turn.',tip:'Quick mental application of the mnemonic.'}]},
+
+// === AERODYNAMICS ===
+{id:'ad1',topic:'Aerodynamics',q:'What are the four forces acting on an airplane in flight?',a:'Lift (perpendicular to relative wind, opposes weight), Weight/gravity (straight down, opposes lift), Thrust (forward from engine/prop, opposes drag), Drag (rearward, parallel to relative wind, opposes thrust). In straight, level, unaccelerated flight: lift equals weight AND thrust equals drag.',ref:'FAA-H-8083-25B Ch.5',diff:'core',tags:['likely'],keyPoints:['Lift opposes weight','Thrust opposes drag','Equilibrium in S&L unaccelerated flight','Lift perpendicular to relative wind','Drag parallel to relative wind'],tips:'Simple question — answer clearly and concisely, then let the DPE move on or dig deeper.',dontSay:'Don\'t say lift acts "upward" — it acts perpendicular to the RELATIVE WIND, which isn\'t always up.',ifUnsure:'"PHAK Chapter 5 covers the four forces in detail."',followUps:[{q:'In a steady climb, are the four forces in equilibrium?',a:'In a steady (constant speed) climb, yes — the forces are in equilibrium. A component of weight acts rearward along the flight path, requiring more thrust. But if speed is constant, forces balance.',tip:'This catches many students — steady state means equilibrium even in a climb.'}]},
+
+{id:'ad2',topic:'Aerodynamics',q:'What causes an airplane to stall?',a:'Exceeding the critical angle of attack — typically 16-18° for most GA airfoils. At the critical AOA, airflow separates from the upper wing surface, destroying lift. CRITICAL: A stall is caused by ANGLE OF ATTACK, not speed. A stall can occur at ANY airspeed, ANY attitude, ANY power setting, ANY configuration. The critical angle of attack is always the same regardless of weight, bank, or configuration — though the SPEED at which you reach that angle changes.',ref:'FAA-H-8083-25B Ch.5',diff:'core',tags:['likely'],keyPoints:['Exceeding critical angle of attack','NOT caused by low speed','Can occur at any airspeed/attitude','Critical AOA is constant (~16-18°)','Airflow separation from upper surface'],tips:'Lead with "exceeding the critical angle of attack" — that\'s THE answer the DPE wants to hear first.',dontSay:'NEVER say "flying too slow causes a stall." This is the #1 wrong answer and shows fundamental misunderstanding. It will concern your DPE.',ifUnsure:'"A stall is always about exceeding the critical angle of attack — I can reference PHAK Chapter 5."',followUps:[{q:'Can you stall the airplane in a 60° bank at cruise speed?',a:'Yes — in a 60° bank, load factor is 2G, which increases stall speed by ~40%. If you pull back enough to exceed the critical AOA at that speed, the wing stalls. This is why the accelerated stall/base-to-final turn accident is so deadly.',tip:'This scenario tests whether you truly understand that stalls are about AOA, not speed.'}]},
+
+{id:'ad3',topic:'Aerodynamics',q:'Explain the two types of drag.',a:'Parasite drag: caused by moving through air, NOT related to lift. Increases with speed squared. Three subtypes: form drag (shape), skin friction (surface roughness), interference drag (component junctions). Induced drag: byproduct of lift production — wingtip vortices. DECREASES with speed (because AOA decreases at higher speeds). Total drag = parasite + induced. Minimum total drag speed is where the curves cross — this is L/Dmax and corresponds to best glide speed.',ref:'FAA-H-8083-25B Ch.5',diff:'common',tags:['likely'],keyPoints:['Parasite: increases with speed','Induced: decreases with speed (from lift)','Total drag minimum = best glide speed','L/Dmax concept','Three types of parasite drag'],tips:'Connect the drag curves to a practical application — best glide speed.',dontSay:'Don\'t just define them — explain the speed relationship and why it matters.',ifUnsure:'"Drag is covered in PHAK Chapter 5 — parasite increases with speed, induced decreases."',followUps:[{q:'At what speed is total drag minimized and why does that matter?',a:'At L/Dmax — this is the best glide speed (68 KIAS in the C172S). It\'s where you get maximum distance per altitude lost. Critical for engine-out glide to a landing spot.',tip:'Connecting theory to the engine-out scenario shows practical application.'}]},
+
+{id:'ad4',topic:'Aerodynamics',q:'Why does the C172S tend to turn left during high-power, low-speed flight?',a:'Four left-turning tendencies: 1) Torque — engine turns prop clockwise, reaction rolls airplane left. 2) P-factor — at high AOA, descending blade (right) has higher AOA/more thrust, yawing nose left. 3) Spiraling slipstream — prop wash corkscrews and hits left side of vertical stabilizer, pushing tail right/nose left. 4) Gyroscopic precession — when nose is raised, applied force is felt 90° in direction of rotation, yawing nose left. Compensate with right rudder.',ref:'FAA-H-8083-25B Ch.5',diff:'core',tags:['likely'],keyPoints:['Torque (reaction to prop rotation)','P-factor (asymmetric thrust)','Spiraling slipstream','Gyroscopic precession','Right rudder compensates'],tips:'Name all four. Most students forget precession — knowing all four impresses.',dontSay:'Don\'t say "just use right rudder" without explaining WHY. The DPE wants to know you understand the physics.',ifUnsure:'"There are four left-turning tendencies — torque, P-factor, spiraling slipstream, and gyroscopic precession."',followUps:[{q:'Which of these is most noticeable during takeoff?',a:'Torque and P-factor are most significant during high-power, low-speed conditions like takeoff. Spiraling slipstream is constant. Gyroscopic precession is felt when the attitude changes (nose raised during rotation).',tip:'Relate each to a specific phase of flight.'}]},
+
+{id:'ad5',topic:'Aerodynamics',q:'What is ground effect?',a:'Within one wingspan of the surface (~36 ft for C172S), the ground interferes with wingtip vortices, reducing induced drag and increasing lift. On takeoff: aircraft may become airborne at lower-than-normal speed — if you rotate too early, you\'ll fly in ground effect but may not climb out. On landing: airplane floats further as ground effect cushions descent. Technique: on takeoff, accelerate to proper Vr. On landing, expect float.',ref:'FAA-H-8083-25B Ch.5',diff:'common',tags:['likely'],keyPoints:['Within one wingspan of surface','Reduces induced drag','Increases effective lift','Can trap you on takeoff','Causes float on landing','~36 feet for C172S'],tips:'Explain both the takeoff AND landing implications.',dontSay:'Don\'t say ground effect is bad — it\'s just physics. The key is managing it properly.',ifUnsure:'"Ground effect occurs within one wingspan of the surface and is covered in PHAK Chapter 5."',followUps:[{q:'How does ground effect affect a soft-field takeoff?',a:'You use ground effect to your advantage — lift off at a lower speed and accelerate in ground effect before climbing out. This minimizes time on the soft surface while building speed.',tip:'This connects aerodynamic theory to a practical maneuver.'}]},
+// === AIRSPACE ===
+{id:'as1',topic:'Airspace',q:'Walk me through the airspace classes from ground up — requirements for each.',a:'Class G (uncontrolled): surface to 700/1,200 AGL. No clearance needed. Day below 1,200 AGL: 1SM, clear of clouds. Class E (controlled): starts at various altitudes. VFR: 3SM vis, 500 below/1,000 above/2,000 horizontal from clouds. Class D: surface to ~2,500 AGL (blue dashed lines). Two-way radio communication. 3SM, 500/1,000/2,000. Class C: surface to ~4,000 AGL (solid magenta). Radio + Mode C transponder. 3SM, 500/1,000/2,000. Class B: surface to ~10,000 MSL (solid blue). Specific ATC CLEARANCE + Mode C. 3SM, clear of clouds. Class A: 18,000-60,000 MSL. IFR only.',ref:'14 CFR §91.155, AIM 3-2',diff:'core',tags:['likely'],keyPoints:['Class G: 1SM clear of clouds (day/below 1200)','Class E: 3SM, 500/1000/2000','Class D: radio communication','Class C: radio + Mode C','Class B: ATC CLEARANCE + Mode C, clear of clouds','Class A: IFR only'],tips:'The "3-152" rule covers most controlled airspace below 10,000. Know the EXCEPTIONS (Class B and Class G).',dontSay:'Don\'t confuse "communication established" (Class D) with "clearance received" (Class B). Big difference.',ifUnsure:'"§91.155 has the VFR weather minimums. I remember 3-152 as the baseline for controlled airspace."',followUps:[{q:'What\'s the difference between "establishing communication" for Class D and "receiving clearance" for Class B?',a:'Class D: hearing your callsign from ATC constitutes establishing communication — even if they say "stand by." Class B: you need explicit "cleared into Class Bravo" — "stand by" is NOT clearance and you may NOT enter.',tip:'This distinction is critical and frequently tested.'}]},
+
+{id:'as2',topic:'Airspace',q:'What is the Mode C veil?',a:'Airspace within 30 NM of a Class B primary airport, surface to 10,000 MSL. All aircraft must have an operating transponder with Mode C (altitude reporting), regardless of whether you\'re in, under, over, or through the Class B itself. If transponder fails, you can request a deviation from ATC.',ref:'14 CFR §91.215',diff:'core',tags:['likely'],keyPoints:['30 NM from Class B primary airport','Surface to 10,000 MSL','Transponder with Mode C required','Applies even outside Class B','Can request deviation if transponder fails'],tips:'Know the 30 NM distance — it extends well beyond the actual Class B boundaries.',dontSay:'Don\'t confuse the Mode C veil (30 NM circle) with the Class B airspace itself (variable shape).',ifUnsure:'"§91.215 covers transponder requirements including the Mode C veil."',followUps:[{q:'Can you fly without a transponder inside the Mode C veil?',a:'Only with prior ATC authorization. You must request the deviation before entering. This is not common and usually only granted for specific situations.',tip:'Know that deviations are possible but uncommon.'}]},
+
+{id:'as3',topic:'Airspace',q:'What are the different types of special use airspace?',a:'Prohibited: flight PROHIBITED, no exceptions (e.g., P-56 over White House). Restricted: hazardous activities (artillery, missiles) — need controlling agency permission. Warning: like restricted but over international waters 3+ NM from coast. MOAs: military training — VFR permitted but exercise caution. Alert areas: high pilot training volume — no restrictions, extra vigilance. Controlled Firing Areas: suspended when aircraft spotted — not charted.',ref:'AIM 3-4, 14 CFR §73',diff:'core',tags:['likely','dpe-focus'],keyPoints:['Prohibited = NO entry','Restricted = permission needed','Warning = over international waters','MOAs = VFR permitted, use caution','Alert = no restrictions, be vigilant','CFAs = not charted'],tips:'Know the hierarchy from most to least restrictive. Distinguish restricted (need permission) from prohibited (no entry at all).',dontSay:'Don\'t say MOAs are off-limits — VFR flight IS allowed, just exercise extreme caution and contact FSS for activity status.',ifUnsure:'"Special use airspace is covered in AIM 3-4."',followUps:[{q:'You see a restricted area on your sectional along your route. What do you do?',a:'Check the times listed on the chart. Contact the controlling agency (shown on the chart) to see if it\'s active. If active, route around it. If inactive, you can fly through it.',tip:'Show you know how to get the information you need.'}]},
+
+{id:'as4',topic:'Airspace',q:'What are the basic VFR weather minimums you need to know?',a:'Baseline "3-152" for controlled airspace below 10,000 MSL: 3 SM visibility, 500 below, 1,000 above, 2,000 horizontal from clouds. Exceptions: Class B — 3SM and CLEAR OF CLOUDS (no distance requirement). Class G below 1,200 AGL day — 1SM clear of clouds. Class G below 1,200 night — 3SM, 500/1,000/2,000. Above 10,000 MSL (E and G) — 5SM, 1,000 below/1,000 above/1 SM horizontal.',ref:'14 CFR §91.155',diff:'core',tags:['likely'],keyPoints:['3-152 baseline (controlled, below 10,000)','Class B: 3SM clear of clouds','Class G day <1200: 1SM clear of clouds','Above 10,000: 5SM, 1000/1000/1SM','Night Class G: 3SM 500/1000/2000'],tips:'Master the exceptions to 3-152. Class B and Class G are the ones that trip people up.',dontSay:'Don\'t say "3 miles and 500/1000/2000 everywhere" — the exceptions matter.',ifUnsure:'"§91.155 has the complete table. The baseline is 3-152 with exceptions for B and G."',followUps:[{q:'You\'re flying at 12,000 MSL in Class E. What are your weather minimums?',a:'Above 10,000 MSL: 5 SM visibility, 1,000 ft below, 1,000 ft above, 1 statute mile horizontal from clouds.',tip:'The above-10,000 rule changes both visibility AND cloud clearance.'}]},
+
+{id:'as5',topic:'Airspace',q:'What is a TFR and how do you check for them?',a:'Temporary Flight Restriction — restricts aircraft in a defined area. Common reasons: Presidential movements (inner 10NM no-fly, outer 30NM ring), sporting events (3NM, surface to 3,000 AGL), disasters, wildfires, space launches. Check: tfr.faa.gov, 1800wxbrief.com, ForeFlight, FSS briefing. Check before EVERY flight. Consequences: certificate action, civil penalties up to $100,000, possible military intercept for Presidential TFRs.',ref:'14 CFR §91.137-145',diff:'core',tags:['likely'],keyPoints:['Check before every flight','Multiple checking sources','Presidential TFRs are largest','Severe consequences for violations','tfr.faa.gov is primary source'],tips:'Say you check TFRs before every flight — not just cross-countries.',dontSay:'Don\'t take TFRs lightly. A TFR violation is one of the most serious things a pilot can do.',ifUnsure:'"TFRs are covered in §91.137-145 and I check tfr.faa.gov before every flight."',followUps:[{q:'What is Special VFR and when would you request it?',a:'SVFR allows operation in controlled airspace (B,C,D, surface E) below basic VFR minimums. Minimums: 1SM visibility, clear of clouds. Pilot must request it — ATC can\'t suggest it. At night, must be instrument rated and equipped. High-risk for low-time pilots.',tip:'Emphasize that the PILOT must request it, and be honest about your comfort level.'}]},
+
+// === EMERGENCY PROCEDURES ===
+{id:'em1',topic:'Emergency Procedures',q:'Engine failure at 3,000 feet AGL. What do you do?',a:'Immediately: 1) Best glide speed — 68 KIAS in C172S; 2) Pick a landing spot — suitable field, into the wind; 3) Attempt restart: fuel selector BOTH, mixture RICH, mags BOTH, fuel pump ON; 4) If no restart: squawk 7700, mayday on current freq or 121.5; 5) Brief passengers — belts tight, brace, door unlatched; 6) When landing assured: mixture cutoff, fuel off, mags off, master off (AFTER flaps set); 7) Maintain best glide to field, use flaps on final. AVIATE, NAVIGATE, COMMUNICATE.',ref:'C172S POH Section 3',diff:'core',tags:['likely'],keyPoints:['Best glide 68 KIAS immediately','Pick a landing spot','Systematic restart attempt','Squawk 7700, declare mayday','Passenger brief','Secure engine when landing assured'],tips:'Say "aviate, navigate, communicate" to show your priority structure. FLY THE AIRPLANE FIRST.',dontSay:'Don\'t start with "call ATC" — the first action is always fly the airplane and establish best glide.',ifUnsure:'"POH Section 3 has the emergency checklist — the immediate action is best glide speed."',followUps:[{q:'Why do you unlatch the cabin door before landing?',a:'In a hard landing, the airframe can deform and jam the door shut, trapping occupants. Unlatching it before touchdown ensures you can get out.',tip:'This detail shows thorough emergency preparation.'}]},
+
+{id:'em2',topic:'Emergency Procedures',q:'What is the emergency authority of the PIC?',a:'Per §91.3: PIC is directly responsible for and final authority on aircraft operation. In an emergency requiring immediate action, the PIC may deviate from ANY rule to the extent needed. Must submit written report only upon request. This means: land on a taxiway, bust airspace, exceed speed limits — whatever is necessary for safety.',ref:'14 CFR §91.3',diff:'core',tags:['likely'],keyPoints:['PIC is final authority','May deviate from ANY rule in emergency','Only need to report if requested','Safety is the priority'],tips:'State it with confidence — "I am the final authority." DPEs want to see you own this responsibility.',dontSay:'Don\'t hesitate or qualify it too much. In an emergency, act decisively.',ifUnsure:'"§91.3 gives the PIC authority to deviate from any rule in an emergency."',followUps:[{q:'After deviating from a rule, what happens next?',a:'You must submit a written report to the FAA only if requested — not automatically. However, it\'s wise to document what happened while it\'s fresh.',tip:'Emphasize "upon request" — you don\'t have to self-report.'}]},
+
+{id:'em3',topic:'Emergency Procedures',q:'What are the emergency transponder codes?',a:'7700 — Emergency (any emergency). 7600 — Lost communications (radio failure). 7500 — Hijack. Memory aid: "75 taken alive, 76 lost the fix, 77 going to heaven." Always squawk 7700 unless specifically experiencing comm failure or hijack.',ref:'AIM 6-2-2',diff:'core',tags:['likely'],keyPoints:['7700 = emergency','7600 = comm failure','7500 = hijack','7700 is default for any emergency'],tips:'The mnemonic makes this easy. State it confidently.',dontSay:'Don\'t mix up the codes. Getting 7500 and 7700 confused could cause a very bad day.',ifUnsure:'"75 taken alive, 76 lost the fix, 77 going to heaven."',followUps:[{q:'You squawk 7700. What happens on ATC\'s end?',a:'Your target flashes/highlights on their scope with an emergency alert. All controllers in the area are alerted. They will attempt radio contact and provide assistance — vectors, traffic advisories, emergency equipment notification.',tip:'Understanding what ATC sees helps you use the system effectively.'}]},
+
+{id:'em4',topic:'Emergency Procedures',q:'What would you do if you had an electrical fire in flight?',a:'1) Master switch OFF — remove power source; 2) All avionics/electrical OFF; 3) Cabin heat/air OFF initially (don\'t feed fire); 4) Fire extinguisher if fire visible; 5) Once out, ventilate cabin; 6) If you need electrical for nav/comm, carefully turn master on, add circuits one at a time to find the failed one — leave it off; 7) Land as soon as practicable. If fire cannot be extinguished — LAND IMMEDIATELY.',ref:'C172S POH Section 3',diff:'core',tags:['likely'],keyPoints:['Master switch OFF first','All electrical OFF','Don\'t feed fire with ventilation','Fire extinguisher if visible','Isolate failed circuit','Land as soon as practicable'],tips:'Know the difference between "as soon as practicable" and "as soon as possible." Practicable means considering all factors; possible means the nearest runway.',dontSay:'Don\'t forget to mention ventilation AFTER the fire is out — smoke inhalation is dangerous.',ifUnsure:'"POH Section 3 has the electrical fire checklist. First step is always master switch OFF."',followUps:[{q:'How is an electrical fire different from an engine fire?',a:'Electrical fire: cut power source (master off). Engine fire: mixture cutoff, fuel off, airspeed to increase airflow may help, plan emergency landing. Engine compartment fire requires getting on the ground quickly.',tip:'Know both checklists — they\'re different procedures.'}]},
+
+{id:'em5',topic:'Emergency Procedures',q:'When must you report to the NTSB?',a:'ACCIDENT (report immediately): death or serious injury, OR substantial damage to aircraft. Serious injury: hospitalization 48+ hours within 7 days, bone fracture (except fingers/toes/nose), severe hemorrhage, organ injury, 2nd/3rd degree burns or >5% of body. Substantial damage: adversely affects structural strength, performance, or flight characteristics. NOT substantial: engine failure, prop damage alone, bent fairings, dents, small holes. File written report within 10 days for accidents.',ref:'49 CFR Part 830',diff:'core',tags:['likely'],keyPoints:['Accident: death/serious injury or substantial damage','Report immediately to NTSB','Serious injury defined specifically','Substantial damage defined','File report within 10 days','Know what is NOT substantial'],tips:'Know the specific definitions of "serious injury" and "substantial damage" — DPEs test the edge cases.',dontSay:'Don\'t say every incident requires NTSB reporting. Only specific categories trigger the requirement.',ifUnsure:'"NTSB reporting is covered in Part 830 — accidents must be reported immediately."',followUps:[{q:'Your prop strikes the ground during landing but the airplane is otherwise fine. Is that an accident?',a:'Likely NOT — a prop strike alone is not considered substantial damage. However, it may require an engine teardown inspection. If the prop strike reveals crankshaft damage, that could change the assessment.',tip:'The prop strike question is a classic DPE test of the definitions.'}]},
+// === NIGHT OPERATIONS ===
+{id:'nt1',topic:'Night Operations',q:'What is the definition of "night" for logging vs currency purposes?',a:'For LOGGING night time: end of evening civil twilight to beginning of morning civil twilight (sun 6° below horizon). For CURRENCY (§61.57 passenger carrying): 1 hour after sunset to 1 hour before sunrise — this is a WIDER window. For POSITION LIGHTS: required sunset to sunrise (§91.209). Three different definitions for three different purposes.',ref:'14 CFR §1.1, §61.57, §91.209',diff:'core',tags:['likely'],keyPoints:['Logging: civil twilight to civil twilight','Currency: 1hr after sunset to 1hr before sunrise','Position lights: sunset to sunrise','Three DIFFERENT definitions','Currency window is widest'],tips:'The fact that there are three different definitions impresses DPEs. State all three.',dontSay:'Don\'t say "night is night" — the three regulatory definitions are different and it matters.',ifUnsure:'"The definitions of night are in §1.1, §61.57, and §91.209 — and they\'re all different."',followUps:[{q:'For night currency, do touch-and-goes count?',a:'No — must be to a FULL STOP. Three takeoffs and three landings to a full stop.',tip:'This catches many students. Emphasize "full stop."'}]},
+
+{id:'nt2',topic:'Night Operations',q:'How does the eye adapt to darkness and how should pilots prepare?',a:'Dark adaptation takes ~30 minutes. Eye uses cones (central, color, detail) by day and rods (peripheral, light-sensitive) at night. Rods are outside the fovea — use off-center viewing (look 10-15° to the side). Prepare: avoid bright white light 30 min before flight, use red lights, dim instrument panel, avoid smoking (CO reduces night vision). Supplemental O2 above 5,000 ft at night improves vision since rods are more sensitive to hypoxia.',ref:'AIM 8-1-6',diff:'core',tags:['likely'],keyPoints:['30 minutes for dark adaptation','Rods for night vision (peripheral)','Off-center viewing technique','Avoid bright lights before flight','Dim cockpit lights','O2 above 5,000 at night'],tips:'Mention off-center viewing — it\'s a practical technique that shows you understand the physiology.',dontSay:'Don\'t just say "let your eyes adjust." Explain the rod/cone difference and the off-center technique.',ifUnsure:'"Night vision physiology is covered in AIM 8-1-6."',followUps:[{q:'Why would you use supplemental oxygen at 5,000 feet at night?',a:'Rods are more sensitive to hypoxia than cones. Even mild oxygen reduction at 5,000 feet can noticeably degrade night vision, even though you\'d have no daytime symptoms until 12,500 feet.',tip:'This is a sophisticated answer that shows depth of understanding.'}]},
+
+{id:'nt3',topic:'Night Operations',q:'What aircraft lighting is required for night flight?',a:'Required: Position/nav lights (red left, green right, white tail) — sunset to sunrise. Anti-collision lights (beacon/strobes) — required on aircraft certified after 3/11/96, can be turned off if PIC determines safety hazard. Landing light — required only if for hire, but strongly recommended. Pilot-controlled lighting at airports: 7 clicks = high intensity, 5 = medium, 3 = low, on CTAF frequency.',ref:'14 CFR §91.205, §91.209, AIM 2-1',diff:'core',tags:['likely'],keyPoints:['Position lights: sunset to sunrise','Anti-collision: required post-1996','Landing light: only required for hire','Pilot-controlled: 7-5-3 clicks on CTAF','VASI/PAPI for glidepath'],tips:'Know the 7-5-3 clicks for pilot-controlled lighting — very practical.',dontSay:'Don\'t say the landing light is always required — only for hire. But always recommend using it.',ifUnsure:'"§91.209 covers position light requirements, §91.205(c) covers night equipment."',followUps:[{q:'What does "red over white" mean on a VASI?',a:'"Red over white, you\'re alright" — on the correct glidepath. "Red over red, you\'re dead" — too low. "White over white, you\'ll fly all night" — too high.',tip:'This mnemonic is essential for night approaches.'}]},
+
+{id:'nt4',topic:'Night Operations',q:'What visual illusions might you experience at night?',a:'Black hole approach: dark terrain/water, no horizon — tendency to fly too low. Use VASI/PAPI. Featureless terrain: spatial disorientation without visible horizon. Autokinesis: staring at a stationary light makes it appear to move — don\'t fixate. False horizon: sloping cloud deck or lights mistaken for horizon. Runway width illusion: narrower runway appears farther (fly too low), wider appears closer (fly too high).',ref:'AIM 8-1-5',diff:'common',tags:['likely'],keyPoints:['Black hole approach = fly too low','Autokinesis from light fixation','False horizon from clouds/lights','Runway width illusion','Use instruments to supplement visual'],tips:'For each illusion, state the illusion AND the mitigation.',dontSay:'Don\'t just list them — explain why each is dangerous and how to counter it.',ifUnsure:'"Night illusions are covered in AIM 8-1-5."',followUps:[{q:'How do you mitigate the black hole approach illusion?',a:'Use VASI/PAPI if available, monitor instruments (altimeter, VSI), use normal approach speed, be especially cautious over water or dark terrain.',tip:'Practical mitigations show real-world readiness.'}]},
+
+// === HUMAN FACTORS ===
+{id:'hf1',topic:'Human Factors',q:'Walk me through the I\'M SAFE checklist.',a:'Personal fitness-for-flight assessment before every flight: I — Illness (any symptoms?), M — Medication (anything impairing? many OTC meds disqualifying), S — Stress (work/family/financial affecting judgment?), A — Alcohol (8 hrs bottle to throttle, no 0.04% BAC, no influence), F — Fatigue (well-rested?), E — Eating/Emotion (properly nourished? emotionally fit?). If ANY item is questionable, consider postponing.',ref:'FAA-H-8083-25B Ch.17, 14 CFR §91.17',diff:'core',tags:['likely'],keyPoints:['Illness','Medication','Stress','Alcohol (8hr/0.04%)','Fatigue','Eating/Emotion'],tips:'Say you use this before EVERY flight — not just when you feel off.',dontSay:'Don\'t minimize any factor. "I had a beer 6 hours ago but I feel fine" is not an acceptable answer.',ifUnsure:'"I\'M SAFE is in the PHAK Chapter 17 — it covers all personal fitness factors."',followUps:[{q:'You took Benadryl for allergies last night. Can you fly this morning?',a:'Many OTC antihistamines (including diphenhydramine/Benadryl) are sedating and have long-lasting effects. The FAA generally requires waiting 5× the dosing interval. When in doubt, check with your AME or call the AOPA medical line before flying.',tip:'Be conservative with medications. When in doubt, don\'t fly.'}]},
+
+{id:'hf2',topic:'Human Factors',q:'What are the regulations regarding alcohol and flying?',a:'§91.17: 1) No crewmember within 8 hours of consuming alcohol; 2) No crewmember under the influence; 3) No crewmember with BAC ≥ 0.04%; 4) No crewmember using any drug affecting faculties contrary to safety. Also §61.15: must report DUI/DWI conviction or license suspension to FAA within 60 days. Two or more convictions can result in certificate action.',ref:'14 CFR §91.17, §61.15',diff:'core',tags:['likely'],keyPoints:['8 hours bottle to throttle','No influence of alcohol','BAC < 0.04%','No impairing drugs','Report DUI within 60 days','Two convictions = certificate risk'],tips:'State all four parts of §91.17 — most students only remember "8 hours."',dontSay:'Don\'t say "8 hours is enough" — you can still be under the influence after 8 hours. The 0.04% limit is independent of the 8-hour rule.',ifUnsure:'"§91.17 has four requirements, not just the 8-hour rule."',followUps:[{q:'You had several drinks last night and it\'s been 10 hours. Are you legal?',a:'The 8-hour rule is met, but you may still be under the influence or above 0.04%. If you feel ANY effects, you are NOT legal to fly regardless of time passed. Be honest with yourself.',tip:'The right answer shows maturity and self-awareness.'}]},
+
+{id:'hf3',topic:'Human Factors',q:'Describe the five hazardous attitudes and their antidotes.',a:'1) Anti-authority ("Don\'t tell me") → "Follow the rules, they\'re usually right." 2) Impulsivity ("Do something quickly!") → "Not so fast, think first." 3) Invulnerability ("It won\'t happen to me") → "It could happen to me." 4) Macho ("I can do it") → "Taking chances is foolish." 5) Resignation ("What\'s the use?") → "I\'m not helpless, I can make a difference." Recognizing them in yourself is the first step.',ref:'FAA-H-8083-25B Ch.17',diff:'core',tags:['likely'],keyPoints:['Anti-authority','Impulsivity','Invulnerability','Macho','Resignation','Each has a specific antidote'],tips:'Know all five WITH their antidotes. Give a flying example of one.',dontSay:'Don\'t just list them — show you understand how they apply to real flying decisions.',ifUnsure:'"The five hazardous attitudes are in PHAK Chapter 17."',followUps:[{q:'Which hazardous attitude do you think is most dangerous for low-time pilots?',a:'Many would say invulnerability ("it won\'t happen to me") — new pilots may not appreciate the risks. But get-there-itis (which combines impulsivity and external pressure) is also extremely dangerous for new pilots.',tip:'Show self-awareness about your own risk as a new pilot.'}]},
+
+{id:'hf4',topic:'Human Factors',q:'What is spatial disorientation and how do you recover?',a:'When your body\'s sensory systems conflict with reality — what you feel doesn\'t match instruments. The vestibular system (inner ear) can be fooled: the leans (gradual roll undetected), graveyard spiral (prolonged turn adapted to, leveling feels wrong), Coriolis illusion (head movement in a turn). Prevention: trust instruments over body sensations, avoid rapid head movements, maintain instrument proficiency. Recovery: TRUST YOUR INSTRUMENTS — they don\'t lie.',ref:'AIM 8-1-5',diff:'core',tags:['likely'],keyPoints:['Inner ear vs visual conflict','The leans (most common)','Graveyard spiral','Trust instruments, not body','Avoid rapid head movements'],tips:'Say explicitly: "I would trust my instruments." The DPE wants to hear this.',dontSay:'Don\'t say "I\'d go by feel" — that\'s the opposite of correct. Instruments always win.',ifUnsure:'"Spatial disorientation is in AIM 8-1-5 — the key is always trust instruments over sensations."',followUps:[{q:'You\'re in a night turn and suddenly feel like you\'re banking the other way. What happened?',a:'This is "the leans" — your vestibular system adapted to the turn. When you leveled the wings, it felt like a turn in the opposite direction. Trust your instruments — they show wings level.',tip:'Describe the exact physiology of the illusion.'}]},
+
+// === AIRPORT OPERATIONS ===
+{id:'ao1',topic:'Airport Operations',q:'Describe the standard traffic pattern and how you\'d enter it.',a:'Left traffic at 1,000 ft AGL (unless published otherwise). Five legs: upwind (departure direction), crosswind (perpendicular after departure), downwind (parallel, opposite landing direction), base (turn toward runway), final (aligned for landing). Standard entry: 45° to the midpoint of the downwind leg at pattern altitude. If approaching from other side: overfly 500+ ft above pattern altitude, then descend and enter 45° to downwind.',ref:'AIM 4-3-3',diff:'core',tags:['likely'],keyPoints:['Left traffic unless noted','1,000 AGL standard','Five legs by name','45° entry to downwind','Overfly if from wrong side','Announce on CTAF'],tips:'Draw the pattern in the air as you explain it. Shows you visualize it.',dontSay:'Don\'t say you\'d enter on base or straight-in at an uncontrolled airport without discussing the risks.',ifUnsure:'"AIM 4-3-3 covers traffic pattern procedures."',followUps:[{q:'How do you determine the active runway at an uncontrolled airport?',a:'Check AWOS/ASOS for wind, A/FD for pattern info, listen to CTAF, look at windsock/tetrahedron, observe other traffic. Land into the wind.',tip:'Show multiple sources — don\'t rely on just one.'}]},
+
+{id:'ao2',topic:'Airport Operations',q:'What are the standard light gun signals?',a:'In flight: steady green = cleared to land; flashing green = return for landing; steady red = give way, continue circling; flashing red = airport unsafe, do not land; alternating red/green = extreme caution. On ground: steady green = cleared for takeoff; flashing green = cleared to taxi; steady red = STOP; flashing red = taxi clear of runway; alternating red/green = extreme caution. Acknowledge: day = rock wings (flight) / move ailerons (ground). Night = flash landing light.',ref:'AIM 4-3-13',diff:'core',tags:['likely'],keyPoints:['Steady green = cleared (land or takeoff)','Flashing green = return/taxi','Steady red = stop/give way','Flashing red = danger','Alternating = extreme caution'],tips:'Know in-flight AND on-ground signals. They\'re different!',dontSay:'Don\'t confuse in-flight and ground signals — steady red means different things depending on where you are.',ifUnsure:'"Light gun signals are in AIM 4-3-13. Steady green is always good news."',followUps:[{q:'When would you actually need light gun signals?',a:'Radio failure at a towered airport. You would orbit the airport, rock your wings to get the tower\'s attention, and watch for light signals.',tip:'Context makes the signals meaningful.'}]},
+
+{id:'ao3',topic:'Airport Operations',q:'Explain the airport marking colors and key markings.',a:'Runway markings = WHITE. Taxiway markings = YELLOW. Signs: Red with white text = mandatory (runway hold position, ILS critical area). Black with yellow text/border = location (where you ARE). Yellow with black text = direction (where TO GO). Runway hold position marking: four lines (two solid, two dashed) across taxiway. Hold behind solid lines. Dashed lines on runway side. NEVER cross without clearance at towered airport.',ref:'AIM 2-3',diff:'core',tags:['likely','dpe-focus'],keyPoints:['White = runway, Yellow = taxiway','Red signs = mandatory','Black signs = location','Yellow signs = direction','Hold position: solid lines on your side','Never cross without clearance'],tips:'The hold position marking is critical — know which side is which.',dontSay:'Don\'t say you can cross hold lines without clearance, even if you see no traffic.',ifUnsure:'"AIM 2-3 covers airport markings and signs."',followUps:[{q:'You see a sign with "4-22" on a black background with yellow text. What is it?',a:'It\'s a location sign — you are ON runway 4-22 (or at its intersection). It tells you where you are, not where to go.',tip:'Read the sign and identify its type by color scheme.'}]},
+
+{id:'ao4',topic:'Airport Operations',q:'What are wake turbulence considerations?',a:'Generated by all aircraft from wingtip vortices. Worst behind heavy, clean (no flaps), slow aircraft. Vortices sink ~500 FPM and drift with wind. Avoidance: landing behind larger aircraft — land BEYOND their touchdown point; taking off behind — rotate BEFORE their point and climb above their path. Be cautious of crosswind drifting vortices. The 757 generates disproportionately strong vortices.',ref:'AIM 7-4-6',diff:'common',tags:['likely'],keyPoints:['Worst behind heavy/clean/slow','Vortices sink ~500 FPM','Land BEYOND their touchdown','Rotate BEFORE their rotation','757 has strong vortices','Wind drifts vortices laterally'],tips:'Know the "land beyond, rotate before" rule — it\'s counterintuitive but critical.',dontSay:'Don\'t say wake turbulence is only a big-airport concern. You can encounter it at any airport with mixed traffic.',ifUnsure:'"AIM 7-4-6 covers wake turbulence — the key is knowing where the vortices are."',followUps:[{q:'A Boeing 737 just landed on your runway. When is it safe for you to land?',a:'Wait for the vortices to dissipate (about 2 minutes) or land BEYOND the 737\'s touchdown point. The vortices touch down before the aircraft and sink, so landing past their point puts you above them.',tip:'Concrete scenario application.'}]},
+
+// === NAVIGATION ===
+{id:'nv1',topic:'Navigation',q:'How does a VOR work and how do you use it?',a:'VOR transmits 360 radials from the station. Your receiver compares reference and variable signals to determine which radial you\'re on. To use: tune frequency, identify (Morse code), turn OBS to center CDI with FROM = your current radial. To navigate TO: center CDI with TO indication. Each CDI dot = 2° off course, full scale = 10°. Important: CDI shows displacement from selected radial regardless of heading — you must fly correct heading to track.',ref:'AIM 1-1-3',diff:'core',tags:['likely'],keyPoints:['360 radials from station','Tune, identify, then use','FROM shows your radial','TO for navigation toward station','Each dot = 2° deflection','CDI independent of heading'],tips:'Emphasize that you always IDENTIFY the station before using it.',dontSay:'Don\'t confuse radials (FROM the station) with bearings (TO the station).',ifUnsure:'"VOR operation is in AIM 1-1-3."',followUps:[{q:'The CDI is centered with a FROM flag showing 090. What does that mean?',a:'You are on the 090° radial FROM the station — you are due east of the VOR.',tip:'Simple application — be confident.'}]},
+
+{id:'nv2',topic:'Navigation',q:'How does the altimeter work and what errors does it have?',a:'Aneroid barometer converting atmospheric pressure to altitude. Set local altimeter setting in Kollsman window. Errors: 1) High-to-low pressure without updating = reads HIGHER than actual ("high to low, look out below"); 2) Cold temperature = reads HIGHER than actual (true altitude is lower); 3) Wrong setting = ~1,000 ft per inch of Hg error. Always update from ATIS/AWOS. Above 18,000 MSL: set 29.92 (pressure altitude).',ref:'FAA-H-8083-25B Ch.8, AIM 7-2-2',diff:'core',tags:['likely'],keyPoints:['High to low = look out below','Cold temp = altimeter reads high','~1000 ft per inch Hg error','Update settings frequently','29.92 above 18,000'],tips:'"High to low, look out below" — if you forget everything else, remember this.',dontSay:'Don\'t say the altimeter is always accurate. Temperature and pressure errors can be significant.',ifUnsure:'"Altimeter errors are in PHAK Chapter 8 — the key mnemonic is high to low, look out below."',followUps:[{q:'Flying from high pressure to low pressure area without adjusting. Are you higher or lower than indicated?',a:'LOWER than indicated. The altimeter reads too HIGH. This is dangerous because you may have less terrain clearance than you think.',tip:'This is the most important altimeter concept — get it right.'}]},
+
+{id:'nv3',topic:'Navigation',q:'What\'s the difference between true, magnetic, and compass heading?',a:'True heading: referenced to true north (geographic). Measured on charts. Magnetic heading: true heading corrected for variation (difference between true and magnetic north). East variation = subtract, West = add. Compass heading: magnetic heading corrected for deviation (aircraft magnetic interference, shown on compass correction card). Full chain: TC ± WCA = TH ± variation = MH ± deviation = CH.',ref:'FAA-H-8083-25B Ch.16',diff:'core',tags:['likely'],keyPoints:['True = geographic north','Magnetic = corrected for variation','Compass = corrected for deviation','East is least, West is best','Compass correction card for deviation'],tips:'Walk through the conversion chain step by step.',dontSay:'Don\'t confuse variation (from the chart) with deviation (from the compass card in the aircraft).',ifUnsure:'"I use the chain: True Course, Variation, Magnetic, Deviation, Compass."',followUps:[{q:'Where do you find magnetic variation?',a:'On the sectional chart — isogonic lines (dashed magenta lines) show the variation. The agonic line shows 0° variation.',tip:'Be able to point it out on an actual chart.'}]}
+];
+
+        const allQuestions = questionBank;
+
+        let appState = {
+            currentMode: 'practice',
+            currentTopic: null,
+            currentQuestionIndex: 0,
+            currentQuestions: [],
+            sessionStats: { attempted: 0, correct: 0, streak: 0, byTopic: {} },
+            voiceMode: { enabled: false, readQuestion: true, recognitionEnabled: true, speed: 1 },
+            settings: { apiKey: '', voiceSpeed: 1, readQuestion: true, recognitionEnabled: true },
+            recognition: null,
+            synthesis: window.speechSynthesis
+        };
+
+function init() {
+            loadSettings();
+            calculateDaysLeft();
+            renderTopics();
+            setupEventListeners();
+            setupSpeechRecognition();
+            updateStats();
+            document.getElementById('totalQuestions').textContent = allQuestions.length;
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('dpeSettings');
+            if (saved) {
+                appState.settings = JSON.parse(saved);
+                document.getElementById('apiKeyInput').value = appState.settings.apiKey;
+                document.getElementById('voiceSpeedSelect').value = appState.settings.voiceSpeed;
+                updateToggleStates();
+            }
+        }
+
+        function calculateDaysLeft() {
+            const checkrideDate = new Date('2026-03-30');
+            const today = new Date();
+            const diff = checkrideDate - today;
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('daysLeft').textContent = Math.max(0, days);
+        }
+
+        function renderTopics() {
+            const topicSet = new Set(allQuestions.map(q => q.topic));
+            const topicGrid = document.getElementById('topicGrid');
+            topicGrid.innerHTML = '';
+            topicSet.forEach(topic => {
+                const count = allQuestions.filter(q => q.topic === topic).length;
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.textContent = `${topic} (${count})`;
+                btn.onclick = () => selectTopic(topic, btn);
+                topicGrid.appendChild(btn);
+            });
+        }
+
+        function selectTopic(topic, btn) {
+            appState.currentTopic = topic;
+            appState.currentQuestionIndex = 0;
+            appState.currentQuestions = allQuestions.filter(q => q.topic === topic).sort(() => Math.random() - 0.5);
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('practiceModeContent').style.display = 'none';
+            document.getElementById('questionContent').style.display = 'grid';
+            loadQuestion();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    appState.currentMode = btn.dataset.mode;
+                    switchMode(appState.currentMode);
+                });
+            });
+            document.getElementById('voiceToggle').addEventListener('click', toggleVoiceMode);
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('show');
+            });
+        }
+
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                appState.recognition = new SpeechRecognition();
+                appState.recognition.continuous = false;
+                appState.recognition.interimResults = true;
+                appState.recognition.lang = 'en-US';
+                appState.recognition.onstart = () => {
+                    document.getElementById('micButton').classList.add('listening');
+                    document.getElementById('voiceStatus').textContent = 'Listening...';
+                };
+                appState.recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    document.getElementById('answerInput').value = transcript;
+                };
+                appState.recognition.onend = () => {
+                    document.getElementById('micButton').classList.remove('listening');
+                    document.getElementById('voiceStatus').textContent = '';
+                };
+            }
+        }
+
+        function toggleVoiceMode() {
+            appState.voiceMode.enabled = !appState.voiceMode.enabled;
+            document.getElementById('voiceToggle').classList.toggle('active');
+            if (appState.voiceMode.enabled && appState.currentQuestions.length > 0) {
+                document.getElementById('voiceControlsGroup').style.display = 'flex';
+                readQuestion();
+            } else {
+                document.getElementById('voiceControlsGroup').style.display = 'none';
+                appState.synthesis.cancel();
+            }
+        }
+
+        function toggleMicrophone() {
+            if (appState.recognition) {
+                appState.recognition.start();
+            }
+        }
+
+        function readQuestion() {
+            if (!appState.voiceMode.enabled) return;
+            const question = appState.currentQuestions[appState.currentQuestionIndex];
+            const utterance = new SpeechSynthesisUtterance(question.q);
+            utterance.rate = appState.settings.voiceSpeed || 1;
+            appState.synthesis.cancel();
+            appState.synthesis.speak(utterance);
+        }
+
+        function loadQuestion() {
+            if (appState.currentQuestions.length === 0) return;
+            const q = appState.currentQuestions[appState.currentQuestionIndex];
+            document.getElementById('questionNumber').textContent = `Q${appState.currentQuestionIndex + 1}/${appState.currentQuestions.length}`;
+            document.getElementById('difficultyBadge').textContent = q.diff.toUpperCase();
+            document.getElementById('difficultyBadge').className = `badge ${q.diff}`;
+            document.getElementById('topicName').textContent = q.topic;
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('tagsBadge').innerHTML = q.tags.map(tag => `<span class="badge">${tag}</span>`).join('');
+            document.getElementById('tipText').textContent = q.tips;
+            document.getElementById('dontSayText').textContent = q.dontSay;
+            document.getElementById('ifUnsureText').textContent = q.ifUnsure;
+            document.getElementById('refText').textContent = q.ref;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerReviewContainer').style.display = 'none';
+            document.getElementById('assessmentContainer').innerHTML = '';
+            if (appState.voiceMode.enabled && appState.settings.readQuestion) readQuestion();
+            updateProgressBars();
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            if (!userAnswer) { alert('Please enter an answer.'); return; }
+            const q = appState.currentQuestions[appState.currentQuestionIndex];
+            showAnswerReview(q, userAnswer);
+        }
+
+        async function showAnswerReview(q, userAnswer) {
+            document.getElementById('answerReviewContainer').style.display = 'block';
+            document.getElementById('modelAnswerText').textContent = q.a;
+            document.getElementById('referenceText').textContent = q.ref;
+            document.getElementById('referenceContainer').style.display = 'block';
+            const keyPointsList = document.getElementById('keyPointsList');
+            keyPointsList.innerHTML = q.keyPoints.map(kp => `<div class="key-point"><span class="checkbox-icon">☐</span> <span>${kp}</span></div>`).join('');
+            document.getElementById('keyPointsContainer').style.display = 'block';
+            if (q.followUps && q.followUps.length > 0) {
+                const followUpsList = document.getElementById('followUpsList');
+                followUpsList.innerHTML = q.followUps.map(fu => `<div class="follow-up-item"><div class="follow-up-q">${fu.q}</div><div class="follow-up-a">${fu.a}</div><div class="follow-up-tip">${fu.tip}</div></div>`).join('');
+                document.getElementById('followUpsContainer').style.display = 'block';
+            }
+            if (appState.settings.apiKey) await getAIAssessment(q, userAnswer);
+        }
+
+        async function getAIAssessment(q, userAnswer) {
+            const container = document.getElementById('assessmentContainer');
+            container.innerHTML = '<div style="padding: 15px; color: #94a3b8;">🤖 Assessing...</div>';
+            container.classList.add('show');
+            const prompt = `DPE evaluating answer. Question: "${q.q}" Model: "${q.a}" Key Points: ${q.keyPoints.join(', ')} Answer: "${userAnswer}" Rate as: SATISFACTORY, PARTIALLY SATISFACTORY, or UNSATISFACTORY. Be brief.`;
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': appState.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+                    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 300, system: 'You are a DPE. Be encouraging but honest. 3-5 sentences.', messages: [{ role: 'user', content: prompt }] })
+                });
+                if (!response.ok) throw new Error('API error');
+                const data = await response.json();
+                container.innerHTML = `<div class="assessment-panel show"><div class="assessment-header">🤖 AI Assessment</div><div class="assessment-content">${data.content[0].text}</div></div>`;
+            } catch (error) {
+                container.innerHTML = `<div style="padding: 15px; color: #dc2626;">Error: Check API key</div>`;
+            }
+        }
+
+        function gradeAnswer(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            appState.sessionStats.attempted++;
+            if (grade === 'sat') {
+                appState.sessionStats.correct++;
+                appState.sessionStats.streak++;
+            } else {
+                appState.sessionStats.streak = 0;
+            }
+            const topic = appState.currentQuestions[appState.currentQuestionIndex].topic;
+            if (!appState.sessionStats.byTopic[topic]) appState.sessionStats.byTopic[topic] = { attempted: 0, correct: 0 };
+            appState.sessionStats.byTopic[topic].attempted++;
+            if (grade === 'sat') appState.sessionStats.byTopic[topic].correct++;
+            updateStats();
+        }
+
+        function nextQuestion() {
+            appState.currentQuestionIndex++;
+            if (appState.currentQuestionIndex >= appState.currentQuestions.length) {
+                alert(`Topic complete! ${appState.sessionStats.correct}/${appState.sessionStats.attempted} correct.`);
+                document.getElementById('questionContent').style.display = 'none';
+                document.getElementById('practiceModeContent').style.display = 'block';
+                renderTopics();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function toggleTips(header) {
+            header.nextElementSibling.classList.toggle('show');
+        }
+
+        function updateStats() {
+            const total = appState.sessionStats.attempted;
+            const accuracy = total > 0 ? Math.round((appState.sessionStats.correct / total) * 100) : 0;
+            document.getElementById('questionsAttempted').textContent = total;
+            document.getElementById('accuracy').textContent = accuracy;
+            document.getElementById('streak').textContent = appState.sessionStats.streak;
+            document.getElementById('sessionCorrect').textContent = appState.sessionStats.correct;
+            document.getElementById('sessionAttempted').textContent = total;
+            if (total > 0) document.getElementById('sessionProgressBar').style.width = `${accuracy}%`;
+        }
+
+        function updateProgressBars() {
+            const container = document.getElementById('topicProgressContainer');
+            container.innerHTML = '';
+            const topics = new Set(allQuestions.map(q => q.topic));
+            topics.forEach(topic => {
+                const stats = appState.sessionStats.byTopic[topic] || { attempted: 0, correct: 0 };
+                const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+                container.innerHTML += `<div class="progress-item"><div class="progress-label"><span>${topic}</span><span>${stats.correct}/${stats.attempted}</span></div><div class="progress-bar"><div class="progress-fill" style="width: ${accuracy}%"></div></div></div>`;
+            });
+        }
+
+        function switchMode(mode) {
+            document.getElementById('practiceModeContent').style.display = 'none';
+            document.getElementById('mockModeContent').style.display = 'none';
+            document.getElementById('weakModeContent').style.display = 'none';
+            document.getElementById('questionContent').style.display = 'none';
+            if (mode === 'practice') document.getElementById('practiceModeContent').style.display = 'block';
+            else if (mode === 'mock') document.getElementById('mockModeContent').style.display = 'block';
+            else if (mode === 'weak') document.getElementById('weakModeContent').style.display = 'block';
+        }
+
+        function saveSettings() {
+            appState.settings.apiKey = document.getElementById('apiKeyInput').value;
+            appState.settings.voiceSpeed = parseFloat(document.getElementById('voiceSpeedSelect').value);
+            appState.settings.readQuestion = document.getElementById('readQuestionToggle').classList.contains('active');
+            appState.settings.recognitionEnabled = document.getElementById('recognitionToggle').classList.contains('active');
+            localStorage.setItem('dpeSettings', JSON.stringify(appState.settings));
+            alert('Settings saved!');
+        }
+
+        function clearApiKey() {
+            document.getElementById('apiKeyInput').value = '';
+            appState.settings.apiKey = '';
+            localStorage.setItem('dpeSettings', JSON.stringify(appState.settings));
+            alert('API key cleared.');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
+        }
+
+        function toggleVoiceSetting(setting) {
+            const toggle = setting === 'readQuestion' ? document.getElementById('readQuestionToggle') : document.getElementById('recognitionToggle');
+            toggle.classList.toggle('active');
+        }
+
+        function updateToggleStates() {
+            if (appState.settings.readQuestion) document.getElementById('readQuestionToggle').classList.add('active');
+            if (appState.settings.recognitionEnabled) document.getElementById('recognitionToggle').classList.add('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') document.querySelector('.btn-primary').click();
+            else if (e.key === 'v' || e.key === 'V') toggleVoiceMode();
+        });
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
