@@ -169,13 +169,18 @@
         </div>
 
         <div id="mockModeContent" style="display: none;">
-            <p style="margin-bottom: 20px; color: #94a3b8;">Mock Oral: 60 questions from all topics</p>
-            <button class="btn btn-primary" id="startMockBtn" style="width: 200px;">Start Mock Exam</button>
+            <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;margin-bottom:20px;">
+                <h3 style="color:#f8fafc;margin-bottom:8px;">🎙️ Mock Oral Exam</h3>
+                <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin-bottom:8px;">Simulates a real DPE oral exam. ~60 questions weighted toward high-probability topics. Questions are randomized across all ACS areas, just like a real checkride.</p>
+                <p style="color:#64748b;font-size:13px;">Tip: Time yourself — a real oral typically takes 1.5-2 hours.</p>
+            </div>
+            <button class="btn btn-primary" id="startMockBtn" onclick="startMockExam()" style="width: 200px;">Start Mock Exam</button>
         </div>
 
         <div id="weakModeContent" style="display: none;">
             <p style="margin-bottom: 20px; color: #94a3b8;">Practice your weakest topics:</p>
             <div id="weakAreasContainer"></div>
+            <button class="btn btn-primary" onclick="startWeakAreas()" style="width: 200px; margin-top: 12px;">Start Weak Areas Review</button>
         </div>
 
         <div class="main-content" id="questionContent" style="display: none;">
@@ -1060,6 +1065,78 @@ function init() {
             } else {
                 notes.classList.add('active');
             }
+        }
+
+    
+        function startMockExam() {
+            // Build a weighted set of ~60 questions from all topics
+            const weights = {
+                'Pilot Qualifications': 6, 'Airworthiness': 6, 'Weather': 7,
+                'Cross-Country Planning': 6, 'Performance & Limitations': 5,
+                'Aircraft Systems': 7, 'Aerodynamics': 4, 'Airspace': 6,
+                'Emergency Procedures': 5, 'Night Operations': 3,
+                'Human Factors': 5, 'Airport Operations': 4,
+                'Navigation': 2, 'Scenarios': 5
+            };
+            
+            let examQuestions = [];
+            const topics = [...new Set(allQuestions.map(q => q.topic).filter(t => t))];
+            
+            topics.forEach(topic => {
+                const topicQs = allQuestions.filter(q => q.topic === topic);
+                const count = weights[topic] || 3;
+                const shuffled = topicQs.sort(() => Math.random() - 0.5);
+                examQuestions.push(...shuffled.slice(0, Math.min(count, shuffled.length)));
+            });
+            
+            // Shuffle the whole exam
+            examQuestions.sort(() => Math.random() - 0.5);
+            
+            appState.currentMode = 'mock';
+            appState.currentQuestions = examQuestions;
+            appState.currentQuestionIndex = 0;
+            
+            // Hide mock setup, show question content
+            document.getElementById('mockModeContent').style.display = 'none';
+            document.getElementById('questionContent').style.display = 'block';
+            document.getElementById('totalQuestions').textContent = examQuestions.length;
+            
+            loadQuestion();
+        }
+        
+        function startWeakAreas() {
+            // Find topics with < 80% accuracy or unattempted
+            const weakTopics = [];
+            const stats = JSON.parse(localStorage.getItem('dpeTopicStats') || '{}');
+            const topics = [...new Set(allQuestions.map(q => q.topic).filter(t => t))];
+            
+            topics.forEach(topic => {
+                const s = stats[topic];
+                if (!s || s.attempted === 0 || (s.correct / s.attempted) < 0.8) {
+                    weakTopics.push(topic);
+                }
+            });
+            
+            // If all topics are strong, just give random questions
+            const targetTopics = weakTopics.length > 0 ? weakTopics : topics;
+            let weakQuestions = [];
+            targetTopics.forEach(topic => {
+                const topicQs = allQuestions.filter(q => q.topic === topic);
+                const shuffled = topicQs.sort(() => Math.random() - 0.5);
+                weakQuestions.push(...shuffled.slice(0, Math.min(5, shuffled.length)));
+            });
+            
+            weakQuestions.sort(() => Math.random() - 0.5);
+            
+            appState.currentMode = 'weak';
+            appState.currentQuestions = weakQuestions;
+            appState.currentQuestionIndex = 0;
+            
+            document.getElementById('weakModeContent').style.display = 'none';
+            document.getElementById('questionContent').style.display = 'block';
+            document.getElementById('totalQuestions').textContent = weakQuestions.length;
+            
+            loadQuestion();
         }
 
     </script>
